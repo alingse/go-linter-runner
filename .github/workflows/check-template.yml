@@ -1,4 +1,4 @@
-name: Check Repo with linter
+name: check-template
 run-name: "check repo ${{ github.event.inputs.repo_url }}"
 
 on:
