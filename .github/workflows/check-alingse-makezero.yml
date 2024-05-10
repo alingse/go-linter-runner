@@ -19,7 +19,7 @@ jobs:
           go-version: 1.22
 
       - name: Install
-        run: go install github.com/alingse/makezero@fix-with-copy-and-go-mod
+        run: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
 
       - name: Git Clone
         run: git clone "${{ github.event.inputs.repo_url }}"
