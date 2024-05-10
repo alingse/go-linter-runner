@@ -51,5 +51,6 @@ jobs:
       - name: Process output
         if: steps.check_go_mod.outcome == 'success'
         run: |
+          cd `ls`
           cat hit.log
           exit `grep -c 'append to slice' hit.log`
