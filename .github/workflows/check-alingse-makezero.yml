@@ -39,13 +39,17 @@ jobs:
           exit `go build ./... 2>&1|grep -c warning`
         continue-on-error: true
 
-      - name: Run asasalint
+      - name: Run Linter
         if: steps.check_go_mod.outcome == 'success'
         run: |
           cd `ls`
 
+          touch hit.log
+
           makezero ./... 2>&1|grep -v assign|grep -v copy > hit.log || (test $? -eq 1) && exit 0
 
+      - name: Process output
+        if: steps.check_go_mod.outcome == 'success'
+        run: |
           cat hit.log
-
           exit `grep -c 'append to slice' hit.log`
