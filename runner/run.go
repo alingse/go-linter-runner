@@ -17,13 +17,13 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	args := strings.Split(cfg.LinterCfg.Install, " ")
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
 	cmd.Dir = cfg.LinterCfg.Workdir
-	if err := cmd.Start(); err != nil {
+	if err := cmd.Run(); err != nil {
 		return err
 	}
 	// clone repo
 	cmd = exec.CommandContext(ctx, "git", "clone", cfg.Repo)
 	cmd.Dir = cfg.LinterCfg.Workdir
-	if err := cmd.Start(); err != nil {
+	if err := cmd.Run(); err != nil {
 		return err
 	}
 	// check go.mod exists
@@ -34,7 +34,7 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	// run go mod download
 	cmd = exec.CommandContext(ctx, "go", "mod", "download")
 	cmd.Dir = cfg.RepoDir
-	if err := cmd.Start(); err != nil {
+	if err := cmd.Run(); err != nil {
 		return err
 	}
 	// read default branch for repo
