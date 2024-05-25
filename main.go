@@ -32,13 +32,10 @@ func main() {
 		return
 	}
 	if len(outputs) == 0 {
-		log.Println("no valid output after run")
+		log.Fatal("no valid output after run")
 		return
 	}
 
-	err = runner.Parse(ctx, cfg, outputs)
-	if err != nil {
-		log.Fatal("failed parse output:", err, outputs)
-		return
-	}
+	outputs = runner.Parse(ctx, cfg, outputs)
+	runner.Print(ctx, cfg, outputs)
 }

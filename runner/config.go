@@ -15,18 +15,19 @@ import (
 )
 
 type Config struct {
-	OtherArgs RunArgs
-	LinterCfg *LinterCfg
-	RepoURL   *url.URL
-	Repo      string
-	RepoDir   string
+	OtherArgs  RunArgs
+	LinterCfg  LinterCfg
+	RepoURL    *url.URL
+	Repo       string
+	RepoDir    string
+	RepoBranch string
 }
 
 type LinterCfg struct {
 	Name     string   `yaml:"name"`
 	Linter   string   `yaml:"linter"`
 	Install  string   `yaml:"install"`
-	Workdir  string   `yaml:workdir`
+	Workdir  string   `yaml:"workdir"`
 	Includes []string `yaml:"includes"`
 	Excludes []string `yaml:"excludes"`
 }
@@ -51,6 +52,15 @@ func LoadCfg() (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	// make workdir abs
+	if !path.IsAbs(cfg.LinterCfg.Workdir) {
+		cwd, err := os.Getwd()
+		if err != nil {
+			return nil, err
+		}
+		cfg.LinterCfg.Workdir = path.Join(cwd, cfg.LinterCfg.Workdir)
+	}
+
 	cfg.Repo = strings.TrimSuffix(cfg.Repo, "/")
 	cfg.RepoURL, err = url.Parse(cfg.Repo)
 	if err != nil {
@@ -59,7 +69,6 @@ func LoadCfg() (*Config, error) {
 
 	_, lastDir := path.Split(cfg.RepoURL.Path)
 	cfg.RepoDir = path.Join(cfg.LinterCfg.Workdir, lastDir)
-
 	return &cfg, nil
 }
 
