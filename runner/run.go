@@ -3,6 +3,7 @@ package runner
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path"
@@ -15,16 +16,18 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	// install linter
 	args := strings.Split(cfg.LinterCfg.Install, " ")
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
+	cmd.Dir = cfg.LinterCfg.Workdir
 	if err := cmd.Start(); err != nil {
 		return err
 	}
 	// clone repo
 	cmd = exec.CommandContext(ctx, "git", "clone", cfg.Repo)
+	cmd.Dir = cfg.LinterCfg.Workdir
 	if err := cmd.Start(); err != nil {
 		return err
 	}
 	// check go.mod exists
-	if !isFileExists(path.Join(".", cfg.RepoDir, "go.mod")) {
+	if !isFileExists(path.Join(cfg.RepoDir, "go.mod")) {
 		return ErrSkipNoGoModRepo
 	}
 	return nil
@@ -50,6 +53,12 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 }
 
 func Parse(ctx context.Context, cfg *Config, outputs []string) error {
+	for i, line := range outputs {
+		if strings.Contains(line, cfg.RepoDir) {
+			outputs[i] = strings.ReplaceAll(line, cfg.RepoDir, cfg.Repo)
+		}
+	}
+	fmt.Println(outputs)
 	return nil
 }
 

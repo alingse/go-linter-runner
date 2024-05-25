@@ -31,6 +31,11 @@ func main() {
 		log.Fatal("failed in run linter:", err)
 		return
 	}
+	if len(outputs) == 0 {
+		log.Println("no valid output after run")
+		return
+	}
+
 	err = runner.Parse(ctx, cfg, outputs)
 	if err != nil {
 		log.Fatal("failed parse output:", err, outputs)

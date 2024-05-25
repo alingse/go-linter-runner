@@ -1,5 +1,6 @@
 name: alingse-makezero
 linter: makezero
+workdir: /Users/xxx/
 install: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
 includes:
   - non-zero initialized length
