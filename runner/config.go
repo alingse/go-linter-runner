@@ -20,6 +20,18 @@ type Config struct {
 	LinterCfg *LinterCfg
 }
 
+type LinterCfg struct {
+	Name     string   `yaml:"name"`
+	Linter   string   `yaml:"linter"`
+	Install  string   `yaml:"install"`
+	Includes []string `yaml:"includes"`
+	Excludes []string `yaml:"excludes"`
+}
+
+type RunArgs struct {
+	args map[string][]string
+}
+
 func LoadCfg() *Config {
 	var cfg Config
 	flag.StringVar(&cfg.YamlFile, "yaml", "", "the linter yaml config")
@@ -38,18 +50,6 @@ func LoadCfg() *Config {
 		return nil
 	}
 	return &cfg
-}
-
-type LinterCfg struct {
-	Name     string   `yaml:"string"`
-	Linter   string   `yaml:"string"`
-	Install  string   `yaml:"install"`
-	Includes []string `yaml:"includes"`
-	Excludes []string `yaml:"excludes"`
-}
-
-type RunArgs struct {
-	args map[string][]string
 }
 
 func (r *RunArgs) String() string {
