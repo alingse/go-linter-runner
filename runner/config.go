@@ -20,6 +20,7 @@ type Config struct {
 	RepoURL   *url.URL
 	Repo      string
 	RepoDir   string
+	CWD       string
 }
 
 type LinterCfg struct {
@@ -56,6 +57,11 @@ func LoadCfg() (*Config, error) {
 		return nil, err
 	}
 	_, cfg.RepoDir = path.Split(cfg.RepoURL.Path)
+
+	cfg.CWD, err = os.Getwd()
+	if err != nil {
+		return nil, err
+	}
 	return &cfg, nil
 }
 

@@ -3,7 +3,6 @@ package runner
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 	"os/exec"
 	"path"
@@ -31,23 +30,26 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	return nil
 }
 
-func Run(ctx context.Context, cfg *Config) error {
+func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	cmd := exec.CommandContext(ctx, cfg.LinterCfg.Linter, "./...")
 	cmd.Dir = cfg.RepoDir
 	outputData, err := cmd.CombinedOutput()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	// check includes && excludes
 	output := string(outputData)
 	outputs := strings.Split(output, "\n")
-	outputs2 := make([]string, 0, len(outputs))
+	validOutputs := make([]string, 0, len(outputs))
 	for _, line := range outputs {
 		if includeLine(cfg, line) && !excludeLine(cfg, line) {
-			outputs2 = append(outputs2, output)
+			validOutputs = append(validOutputs, output)
 		}
 	}
-	fmt.Println(outputs2)
+	return validOutputs, nil
+}
+
+func Parse(ctx context.Context, cfg *Config, outputs []string) error {
 	return nil
 }
 

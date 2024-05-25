@@ -26,9 +26,14 @@ func main() {
 		return
 	}
 
-	err = runner.Run(ctx, cfg)
+	outputs, err := runner.Run(ctx, cfg)
 	if err != nil {
 		log.Fatal("failed in run linter:", err)
+		return
+	}
+	err = runner.Parse(ctx, cfg, outputs)
+	if err != nil {
+		log.Fatal("failed parse output:", err, outputs)
 		return
 	}
 }
