@@ -26,10 +26,14 @@ jobs:
         run: |
           ls
 
+      - name: Show Find
+        run: |
+          find /home
+
       - name: Run
         id: run_the_linter
         run: |
-          cd `go-linter-runner`
+          cd go-linter-runner
           go run main.go -yaml ${{github.event.inputs.yaml_file}} -repo ${{ github.event.inputs.repo_url }}
 
         continue-on-error: true
