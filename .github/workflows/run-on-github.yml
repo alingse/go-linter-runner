@@ -24,11 +24,8 @@ jobs:
 
       - name: Show
         run: |
-          ls
-
-      - name: Show Find
-        run: |
-          find /home
+          ls /home/runner/work/go-linter-runner/go-linter-runner
+        continue-on-error: true
 
       - name: Run
         id: run_the_linter
