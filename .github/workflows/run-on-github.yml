@@ -24,16 +24,9 @@ jobs:
         with:
           go-version: 1.22
 
-      - name: Show
-        run: |
-          ls /home/runner/work/go-linter-runner/go-linter-runner
-        continue-on-error: true
-
       - name: Run
         id: run_the_linter
-        run: |
-          go run main.go -yaml ${{github.event.inputs.yaml_file}} -repo ${{ github.event.inputs.repo_url }}
-
+        run: go run main.go -yaml ${{github.event.inputs.yaml_file}} -repo ${{ github.event.inputs.repo_url }}
         continue-on-error: true
 
       - name: Reverse Status
