@@ -4,8 +4,9 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"log"
+	"net/url"
 	"os"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -14,10 +15,11 @@ import (
 )
 
 type Config struct {
-	YamlFile  string
-	Repo      string
 	OtherArgs RunArgs
 	LinterCfg *LinterCfg
+	RepoURL   *url.URL
+	Repo      string
+	RepoDir   string
 }
 
 type LinterCfg struct {
@@ -32,24 +34,29 @@ type RunArgs struct {
 	args map[string][]string
 }
 
-func LoadCfg() *Config {
+func LoadCfg() (*Config, error) {
 	var cfg Config
-	flag.StringVar(&cfg.YamlFile, "yaml", "", "the linter yaml config")
+	var yamlFile string
+	flag.StringVar(&yamlFile, "yaml", "", "the linter yaml config")
 	flag.StringVar(&cfg.Repo, "repo", "", "the repo")
 	flag.Var(&cfg.OtherArgs, "F", "the command args")
 	flag.Parse()
 
-	yamlContent, err := os.ReadFile(cfg.YamlFile)
+	yamlContent, err := os.ReadFile(yamlFile)
 	if err != nil {
-		log.Fatalf("error reading file: %v", err)
-		return nil
+		return nil, err
 	}
 	err = yaml.Unmarshal(yamlContent, &cfg.LinterCfg)
 	if err != nil {
-		log.Fatalf("error parsing yaml: %v", err)
-		return nil
+		return nil, err
 	}
-	return &cfg
+	cfg.Repo = strings.TrimSuffix(cfg.Repo, "/")
+	cfg.RepoURL, err = url.Parse(cfg.Repo)
+	if err != nil {
+		return nil, err
+	}
+	_, cfg.RepoDir = path.Split(cfg.RepoURL.Path)
+	return &cfg, nil
 }
 
 func (r *RunArgs) String() string {
