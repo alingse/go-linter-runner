@@ -31,6 +31,12 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	if !isFileExists(gomodFile) {
 		return ErrSkipNoGoModRepo
 	}
+	// run go mod download
+	cmd = exec.CommandContext(ctx, "go", "mod", "download")
+	cmd.Dir = cfg.RepoDir
+	if err := cmd.Start(); err != nil {
+		return err
+	}
 	// read default branch for repo
 	cmd = exec.CommandContext(ctx, "git", "branch", "--show-current")
 	cmd.Dir = cfg.RepoDir

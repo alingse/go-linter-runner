@@ -1,0 +1,33 @@
+name: check-template
+run-name: "check repo ${{ github.event.inputs.repo_url }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo_url:
+        description: "Any Golang Repo link"
+        default: ""
+        required: true
+      yaml_file:
+        description: "a linter yaml path in this repo"
+        default: ""
+        required: true
+
+jobs:
+  checker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Go environment
+        uses: actions/setup-go@v3.2.0
+        with:
+          go-version: 1.22
+
+      - name: Run
+        id: run_the_linter
+        run: go run main.go -yaml ${{github.event.inputs.yaml_file}} -repo ${{ github.event.inputs.repo_url }}
+
+        continue-on-error: true
+
+      - name: Reverse Status
+        if: steps.run_the_linter.outcome == 'success'
+        run: exit 1
