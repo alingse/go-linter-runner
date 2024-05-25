@@ -1,4 +1,4 @@
-name: check-template
+name: run-on-github
 run-name: "check repo ${{ github.event.inputs.repo_url }}"
 
 on:
@@ -9,7 +9,7 @@ on:
         default: ""
         required: true
       yaml_file:
-        description: "a linter yaml path in this repo"
+        description: "A linter yaml path in this repo"
         default: ""
         required: true
 
@@ -25,13 +25,11 @@ jobs:
       - name: Show
         run: |
           ls
-          ls ..
-          ls ../..
 
       - name: Run
         id: run_the_linter
         run: |
-          ls
+          cd `go-linter-runner`
           go run main.go -yaml ${{github.event.inputs.yaml_file}} -repo ${{ github.event.inputs.repo_url }}
 
         continue-on-error: true
