@@ -1,18 +1,30 @@
 package main
 
 import (
+	"context"
 	"log"
-	"os"
+	"time"
+
+	"github.com/alingse/go-linter-runner/runner"
 )
 
 func main() {
-	repoURL := os.Args[1]
-	hitFileName := os.Args[2]
-	file, err := os.Open(hitFileName)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-	// convert output path go repo url
+	var ctx = context.Background()
+	var cfg = runner.LoadCfg()
+	var defaultTimeout = 10 * 60 * time.Second
+	var err error
 
+	ctx, cancel := context.WithTimeout(ctx, cfg.GetTimeout(defaultTimeout))
+	defer cancel()
+
+	err = runner.Prepare(ctx, cfg)
+	if err != nil {
+		log.Fatal("failed in prepare linter ", err)
+		return
+	}
+	err = runner.Run(ctx, cfg)
+	if err != nil {
+		log.Fatal("failed in run linter ", err)
+		return
+	}
 }
