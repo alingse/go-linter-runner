@@ -24,7 +24,9 @@ jobs:
 
       - name: Run
         id: run_the_linter
-        run: go run main.go -yaml ${{github.event.inputs.yaml_file}} -repo ${{ github.event.inputs.repo_url }}
+        run: |
+          ls
+          go run main.go -yaml ${{github.event.inputs.yaml_file}} -repo ${{ github.event.inputs.repo_url }}
 
         continue-on-error: true
 
