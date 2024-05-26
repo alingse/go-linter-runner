@@ -18,13 +18,13 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
 	cmd.Dir = cfg.LinterCfg.Workdir
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("install linter failed %w", err)
 	}
 	// clone repo
 	cmd = exec.CommandContext(ctx, "git", "clone", cfg.Repo)
 	cmd.Dir = cfg.LinterCfg.Workdir
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("git clon failed %w", err)
 	}
 	// check go.mod exists
 	gomodFile := path.Join(cfg.RepoDir, "go.mod")
@@ -35,14 +35,14 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	cmd = exec.CommandContext(ctx, "go", "mod", "download")
 	cmd.Dir = cfg.RepoDir
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("go mod download failed %w", err)
 	}
 	// read default branch for repo
 	cmd = exec.CommandContext(ctx, "git", "branch", "--show-current")
 	cmd.Dir = cfg.RepoDir
 	output, err := cmd.Output()
 	if err != nil {
-		return err
+		return fmt.Errorf("git branch failed %w", err)
 	}
 	cfg.RepoBranch = strings.TrimSpace(string(output))
 	return nil
