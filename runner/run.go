@@ -24,7 +24,7 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	cmd = exec.CommandContext(ctx, "git", "clone", cfg.Repo)
 	cmd.Dir = cfg.LinterCfg.Workdir
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git clon failed %w", err)
+		return fmt.Errorf("git clone failed %w  repo: %s", err, cfg.Repo)
 	}
 	// check go.mod exists
 	gomodFile := path.Join(cfg.RepoDir, "go.mod")
