@@ -61,7 +61,7 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	validOutputs := make([]string, 0, len(outputs))
 	for _, line := range outputs {
 		if includeLine(cfg, line) && !excludeLine(cfg, line) {
-			validOutputs = append(validOutputs, output)
+			validOutputs = append(validOutputs, line)
 		}
 	}
 	return validOutputs, nil
