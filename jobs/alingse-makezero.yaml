@@ -5,5 +5,5 @@ install: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a0
 includes:
   - non-zero initialized length
 excludes:
-  - funcall
+  - called by funcs
   - assigned by index
