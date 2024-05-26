@@ -1,0 +1,1 @@
+gh search repos $1 --limit 100 --language=go --json id,name,isArchived,isDisabled,isFork,isPrivate,language,openIssuesCount,stargazersCount,updatedAt,createdAt,defaultBranch,forksCount,description,fullName,hasIssues,fullName,license,owner,size,watchersCount,url --jq '.[]' 
