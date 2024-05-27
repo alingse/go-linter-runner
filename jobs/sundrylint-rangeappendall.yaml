@@ -1,7 +1,7 @@
 name: sundrylint-rangeappendall
 linter: sundrylint
 workdir: .
-install: go install github.com/alingse/sundrylint@master
+install: go install github.com/alingse/sundrylint/cmd/sundrylint@main
 includes:
   - append all its data while range
 excludes: []
