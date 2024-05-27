@@ -1,5 +1,5 @@
 name: run-on-github
-run-name: "check repo ${{ github.event.inputs.repo_url }}"
+run-name: "check ${{github.event.inputs.yaml_file}} repo ${{github.event.inputs.repo_url}}"
 
 on:
   workflow_dispatch:
