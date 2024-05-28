@@ -60,6 +60,10 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	outputs := strings.Split(output, "\n")
 	validOutputs := make([]string, 0, len(outputs))
 	for _, line := range outputs {
+		line := strings.TrimSpace(line)
+		if len(line) == 0 {
+			continue
+		}
 		if includeLine(cfg, line) && !excludeLine(cfg, line) {
 			validOutputs = append(validOutputs, line)
 		}
