@@ -1,0 +1,6 @@
+name: testifylint
+linter: testifylint
+workdir: .
+install: go install github.com/Antonboom/testifylint@latest
+includes: []
+excludes: []
