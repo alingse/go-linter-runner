@@ -12,23 +12,27 @@ import (
 	"github.com/carlmjohnson/requests"
 )
 
-type pantryStorage struct {
+type pantryStorage[T any] struct {
 	pantryID     string
 	basketPrefix string
 }
 
-func newPantryStorage(pantryID, basketPrefix string) *pantryStorage {
-	return &pantryStorage{
+const (
+	defaultPantryID string = `02312903-0fec-4112-afd9-92751b1162f7`
+)
+
+func NewPantryStorage[T any](pantryID, basketPrefix string) *pantryStorage[T] {
+	return &pantryStorage[T]{
 		pantryID:     pantryID,
 		basketPrefix: basketPrefix,
 	}
 }
 
-func (ps *pantryStorage) encodeRepo(repo string) string {
+func (ps *pantryStorage[T]) encodeRepo(repo string) string {
 	return base64.StdEncoding.EncodeToString([]byte(repo))
 }
 
-func (ps *pantryStorage) decodeRepo(repo string) (string, error) {
+func (ps *pantryStorage[T]) decodeRepo(repo string) (string, error) {
 	data, err := base64.StdEncoding.DecodeString(repo)
 	if err != nil {
 		return "", err
@@ -40,12 +44,12 @@ func (ps *pantryStorage) decodeRepo(repo string) (string, error) {
 	return repo, nil
 }
 
-func (ps *pantryStorage) buildRepoURL(repo string) string {
+func (ps *pantryStorage[T]) buildRepoURL(repo string) string {
 	basketName := ps.basketPrefix + ps.encodeRepo(repo)
 	return fmt.Sprintf("https://getpantry.cloud/apiv1/pantry/%s/basket/%s", ps.pantryID, basketName)
 }
 
-func (ps *pantryStorage) SetRepoOutput(ctx context.Context, repo string, payload map[string]interface{}) error {
+func (ps *pantryStorage[T]) SetRepoOutput(ctx context.Context, repo string, payload T) error {
 	data, err := json.Marshal(payload)
 	if err != nil {
 		return fmt.Errorf("failed to marshal payload: %w", err)
@@ -69,7 +73,7 @@ type GetReposResponse struct {
 	} `json:"baskets"`
 }
 
-func (ps *pantryStorage) GetRepos(ctx context.Context) ([]string, error) {
+func (ps *pantryStorage[T]) GetRepos(ctx context.Context) ([]string, error) {
 	url := fmt.Sprintf("https://getpantry.cloud/apiv1/pantry/%s", ps.pantryID)
 
 	var response GetReposResponse
@@ -95,21 +99,21 @@ func (ps *pantryStorage) GetRepos(ctx context.Context) ([]string, error) {
 	return repos, nil
 }
 
-func (ps *pantryStorage) GetRepoOutput(ctx context.Context, repo string) (map[string]interface{}, error) {
+func (ps *pantryStorage[T]) GetRepoOutput(ctx context.Context, repo string) (T, error) {
 	url := ps.buildRepoURL(repo)
-	var payload map[string]interface{}
+	var payload T
 	err := requests.
 		URL(url).
 		ToJSON(&payload).
 		Fetch(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get payload: %w", err)
+		return payload, fmt.Errorf("failed to get payload: %w", err)
 	}
 
 	return payload, nil
 }
 
-func (ps *pantryStorage) DeleteRepo(ctx context.Context, repo string) error {
+func (ps *pantryStorage[T]) DeleteRepo(ctx context.Context, repo string) error {
 	url := ps.buildRepoURL(repo)
 	err := requests.
 		URL(url).

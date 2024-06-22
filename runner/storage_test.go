@@ -11,7 +11,7 @@ const (
 )
 
 func TestPantryStorage(t *testing.T) {
-	ps := newPantryStorage(testPantryID, "runner-local-testing")
+	ps := NewPantryStorage[map[string]any](testPantryID, "runner-local-testing")
 	var repos = []string{
 		"https://github.com/alingse/sundrylint",
 		"https://github.com/alingse/asasalint",
@@ -24,20 +24,20 @@ func TestPantryStorage(t *testing.T) {
 			"repo":   repo,
 		}
 		err = ps.SetRepoOutput(ctx, repo, payload)
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(1 * time.Second)
 		if err != nil {
 			t.Errorf("call SetRepoOutput failed repo %s %+v", repo, err)
 			t.Fail()
 		}
 		repos2, err := ps.GetRepos(ctx)
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(1 * time.Second)
 		if err != nil {
 			t.Errorf("call GetRepos failed repo %s %+v", repo, err)
 			t.Fail()
 		}
 		t.Logf("call GetRepos got repos= %+v", repos2)
 		payload2, err := ps.GetRepoOutput(ctx, repo)
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(1 * time.Second)
 		if err != nil {
 			t.Errorf("call GetRepoOutput failed repo %s %+v", repo, err)
 			t.Fail()
@@ -53,7 +53,7 @@ func TestPantryStorage(t *testing.T) {
 		}
 	}
 	repos2, err := ps.GetRepos(ctx)
-	time.Sleep(500 * time.Millisecond)
+	time.Sleep(1 * time.Second)
 	if err != nil {
 		t.Errorf("call GetRepos failed  %+v", err)
 		t.Fail()

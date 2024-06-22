@@ -21,6 +21,12 @@ see
 2. https://github.com/alingse/go-linter-runner/issues/2
 
 
+# Dev
+
+## storage
+
+we use https://getpantry.cloud/ as center storage when run a job
+
 # TODO
 
 - [] Ability to configure more linter yaml

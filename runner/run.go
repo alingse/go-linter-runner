@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"time"
 )
 
 var ErrSkipNoGoModRepo = errors.New("skip this repo for no go.mod file exists")
@@ -90,7 +91,7 @@ func Parse(ctx context.Context, cfg *Config, outputs []string) []string {
 
 var divider = strings.Repeat(`=`, 100)
 
-func Print(ctx context.Context, cfg *Config, outputs []string) {
+func PrintOutput(ctx context.Context, cfg *Config, outputs []string) {
 	fmt.Printf("Run %s with linter `%s` got %d line outputs\n",
 		cfg.LinterCfg.Name, cfg.LinterCfg.Linter, len(outputs))
 	fmt.Println(divider)
@@ -136,4 +137,37 @@ func excludeLine(c *Config, line string) bool {
 		}
 	}
 	return false
+}
+
+type RepoOutputRecord struct {
+	Outputs []string `json:"outputs"`
+	Repo    string   `json:"repo"`
+	Linter  string   `json:"linter"`
+	Config  Config   `json:"config"`
+}
+
+func SaveOutputs(ctx context.Context, cfg *Config, outputs []string) error {
+	fmt.Println("Save json outputs to pantry")
+	record := RepoOutputRecord{
+		Outputs: outputs,
+		Repo:    cfg.Repo,
+		Linter:  cfg.LinterCfg.Linter,
+		Config:  *cfg,
+	}
+	ps := NewPantryStorage[RepoOutputRecord](defaultPantryID, cfg.LinterCfg.Name)
+	N := 3
+	for i := 0; i < N; i++ {
+		err := ps.SetRepoOutput(ctx, cfg.Repo, record)
+		// retry
+		if err != nil && strings.Contains(err.Error(), `unexpected status: 429`) {
+			fmt.Printf("save err %+v and will sleep to try again next %d time\n", err, i)
+			time.Sleep(time.Duration(1+i) * time.Second)
+			continue
+		}
+		if err == nil {
+			break
+		}
+	}
+
+	return nil
 }
