@@ -145,7 +145,10 @@ func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) erro
 	cmd := exec.CommandContext(ctx, "gh", "issue", "comment",
 		strconv.FormatInt(cfg.LinterCfg.Issue.ID, 10),
 		"--body", body)
+	cmd.Dir = "."
 	if err := cmd.Run(); err != nil {
+		data, _ := cmd.Output()
+		fmt.Println("cmd output: ", string(data))
 		return fmt.Errorf("gh issue comment failed %w", err)
 	}
 	return nil
