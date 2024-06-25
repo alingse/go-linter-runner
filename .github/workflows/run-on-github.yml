@@ -17,11 +17,11 @@ jobs:
   checker:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+
       - run: gh issue list
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/checkout@v3
 
       - name: Setup Go environment
         uses: actions/setup-go@v3.2.0
