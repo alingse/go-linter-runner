@@ -17,6 +17,10 @@ jobs:
   checker:
     runs-on: ubuntu-latest
     steps:
+      - run: gh issue list
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: actions/checkout@v3
 
       - name: Setup Go environment
