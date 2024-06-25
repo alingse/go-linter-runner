@@ -30,6 +30,12 @@ type LinterCfg struct {
 	Workdir  string   `yaml:"workdir"`
 	Includes []string `yaml:"includes"`
 	Excludes []string `yaml:"excludes"`
+	Issue    IssueCfg `yaml:"issue"`
+}
+
+type IssueCfg struct {
+	ID      int64 `yaml:"id"`
+	Comment bool  `yaml:"comment"`
 }
 
 type RunArgs struct {

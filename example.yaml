@@ -7,3 +7,6 @@ includes:
 excludes:
   - funcall
   - assigned by index
+issue:
+  id: 0
+  comment: true

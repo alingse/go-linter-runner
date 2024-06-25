@@ -38,9 +38,11 @@ func main() {
 
 	outputs = runner.Parse(ctx, cfg, outputs)
 	runner.PrintOutput(ctx, cfg, outputs)
-	// save to pantry
-	err = runner.SaveOutputs(ctx, cfg, outputs)
-	if err != nil {
-		log.Printf("failed to SaveOutputs err %+v \n", err)
+	// create comment on issue
+	if cfg.LinterCfg.Issue.Comment && cfg.LinterCfg.Issue.ID > 0 {
+		err = runner.CreateIssueComment(ctx, cfg, outputs)
+		if err != nil {
+			log.Printf("failed to SaveOutputs err %+v \n", err)
+		}
 	}
 }

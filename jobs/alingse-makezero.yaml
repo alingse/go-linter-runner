@@ -7,3 +7,6 @@ includes:
 excludes:
   - called by funcs
   - assigned by index
+issue:
+  id: 1
+  comment: true
