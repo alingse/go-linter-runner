@@ -142,7 +142,7 @@ func excludeLine(c *Config, line string) bool {
 func buildIssueComment(cfg *Config, outputs []string) string {
 	var s strings.Builder
 	s.WriteString(fmt.Sprintf("Run `%s` on Repo: %s got output\n", cfg.LinterCfg.Linter, cfg.Repo))
-	s.WriteString("```bash\n")
+	s.WriteString("```\n")
 	for _, o := range outputs {
 		s.WriteString(o)
 		s.WriteString("\n")
