@@ -148,7 +148,8 @@ func buildIssueComment(cfg *Config, outputs []string) string {
 		s.WriteString("\n")
 	}
 	s.WriteString("```\n")
-	s.WriteString(fmt.Sprintf("Report issue: %s/issues", cfg.Repo))
+	s.WriteString(fmt.Sprintf("Report issue: %s/issues\n", cfg.Repo))
+	s.WriteString(fmt.Sprintf("Github actions: %s", os.Getenv("GH_ACTION_LINK")))
 	return s.String()
 }
 
