@@ -139,8 +139,21 @@ func excludeLine(c *Config, line string) bool {
 	return false
 }
 
+func buildIssueComment(cfg *Config, outputs []string) string {
+	var s strings.Builder
+	s.WriteString(fmt.Sprintf("Run `%s` on Repo: %s got output\n", cfg.LinterCfg.Linter, cfg.Repo))
+	s.WriteString("```bash\n")
+	for _, o := range outputs {
+		s.WriteString(o)
+		s.WriteString("\n")
+	}
+	s.WriteString("```\n")
+	s.WriteString(fmt.Sprintf("Report issue: %s/issues", cfg.Repo))
+	return s.String()
+}
+
 func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) error {
-	body := fmt.Sprintf("Repo: %s\n```%s```", cfg.Repo, strings.Join(outputs, "\n"))
+	body := buildIssueComment(cfg, outputs)
 	cmd := exec.CommandContext(ctx, "gh", "issue", "comment",
 		strconv.FormatInt(cfg.LinterCfg.Issue.ID, 10),
 		"--body", body)
