@@ -32,6 +32,8 @@ jobs:
         id: run_the_linter
         run: go run main.go -yaml ${{github.event.inputs.yaml_file}} -repo ${{ github.event.inputs.repo_url }}
         continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Reverse Status
         if: steps.run_the_linter.outcome == 'success'
