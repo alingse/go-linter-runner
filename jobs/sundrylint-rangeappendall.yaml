@@ -5,4 +5,6 @@ install: go install github.com/alingse/sundrylint/cmd/sundrylint@main
 includes:
   - append all its data while range
 excludes: []
-
+issue:
+  id: 3
+  comment: true
