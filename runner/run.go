@@ -146,9 +146,10 @@ func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) erro
 		strconv.FormatInt(cfg.LinterCfg.Issue.ID, 10),
 		"--body", body)
 	cmd.Dir = "."
-	if err := cmd.Run(); err != nil {
+	if data, err := cmd.CombinedOutput(); err != nil {
 		fmt.Printf("cmd is %+v \n", cmd)
 		fmt.Printf("cmd.Args is %+v \n", cmd.Args)
+		fmt.Printf("cmd output %s \n", string(data))
 		exErr, ok := err.(*exec.ExitError)
 		fmt.Printf("exErr is %+v and ok %+v \n", exErr, ok)
 		if ok {
