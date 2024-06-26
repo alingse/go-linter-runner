@@ -7,3 +7,4 @@ excludes: []
 issue:
   id: 2
   comment: true
+exit_fail: false

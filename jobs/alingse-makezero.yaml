@@ -10,3 +10,4 @@ excludes:
 issue:
   id: 1
   comment: true
+exit_fail: false

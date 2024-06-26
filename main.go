@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
 	"github.com/alingse/go-linter-runner/runner"
@@ -22,17 +23,17 @@ func main() {
 
 	err = runner.Prepare(ctx, cfg)
 	if err != nil {
-		log.Fatal("failed in prepare linter:", err)
+		log.Println("failed in prepare linter:", err)
 		return
 	}
 
 	outputs, err := runner.Run(ctx, cfg)
 	if err != nil {
-		log.Fatal("failed in run linter:", err)
+		log.Println("failed in run linter:", err)
 		return
 	}
 	if len(outputs) == 0 {
-		log.Fatal("no valid output after run")
+		log.Println("no valid output after run")
 		return
 	}
 
@@ -43,6 +44,10 @@ func main() {
 		err = runner.CreateIssueComment(ctx, cfg, outputs)
 		if err != nil {
 			log.Printf("failed to SaveOutputs err %+v \n", err)
+			return
 		}
+	}
+	if cfg.LinterCfg.ExitFail {
+		os.Exit(1)
 	}
 }

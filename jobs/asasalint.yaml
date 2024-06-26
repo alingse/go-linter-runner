@@ -1,0 +1,7 @@
+name: asasalint
+linter: asasalint
+workdir: .
+install: go install github.com/alingse/asasalint/cmd/asasalint@latest
+includes: []
+excludes: []
+exit_fail: true

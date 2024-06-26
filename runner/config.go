@@ -31,6 +31,7 @@ type LinterCfg struct {
 	Includes []string `yaml:"includes"`
 	Excludes []string `yaml:"excludes"`
 	Issue    IssueCfg `yaml:"issue"`
+	ExitFail bool     `yaml:"exit_fail"`
 }
 
 type IssueCfg struct {

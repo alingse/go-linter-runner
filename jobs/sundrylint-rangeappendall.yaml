@@ -8,3 +8,4 @@ excludes: []
 issue:
   id: 3
   comment: true
+exit_fail: false

@@ -38,7 +38,3 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
-      - name: Reverse Status
-        if: steps.run_the_linter.outcome == 'success'
-        run: exit 1
