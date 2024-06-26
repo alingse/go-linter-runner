@@ -4,3 +4,6 @@ workdir: .
 install: go install github.com/Antonboom/testifylint@latest
 includes: []
 excludes: []
+issue:
+  id: 2
+  comment: true
