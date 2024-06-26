@@ -147,11 +147,9 @@ func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) erro
 		"--body", body)
 	cmd.Dir = "."
 	if err := cmd.Run(); err != nil {
-		data, err2 := cmd.Output()
 		fmt.Printf("cmd is %+v \n", cmd)
 		fmt.Printf("cmd.Args is %+v \n", cmd.Args)
-		fmt.Println("cmd output: ", string(data), err2)
-		exErr, ok := err2.(*exec.ExitError)
+		exErr, ok := err.(*exec.ExitError)
 		fmt.Printf("exErr is %+v and ok %+v \n", exErr, ok)
 		if ok {
 			fmt.Println(string(exErr.Stderr))
