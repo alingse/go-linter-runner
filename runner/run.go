@@ -140,26 +140,14 @@ func excludeLine(c *Config, line string) bool {
 }
 
 func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) error {
-	fmt.Println("create outputs issue to github issue")
-	if true {
-		cmd := exec.CommandContext(ctx, "gh", "issue", "list")
-		data, err := cmd.CombinedOutput()
-		fmt.Printf("run cmd %+v and got %s %+v \n", cmd, string(data), err)
-	}
-	//body := fmt.Sprintf("Repo: %s\n```%s```", cfg.Repo, strings.Join(outputs, "\n"))
+	body := fmt.Sprintf("Repo: %s\n```%s```", cfg.Repo, strings.Join(outputs, "\n"))
 	cmd := exec.CommandContext(ctx, "gh", "issue", "comment",
 		strconv.FormatInt(cfg.LinterCfg.Issue.ID, 10),
-		"--body", "Testing")
+		"--body", body)
 	cmd.Dir = "."
-	if data, err := cmd.CombinedOutput(); err != nil {
-		fmt.Printf("cmd is %+v \n", cmd)
-		fmt.Printf("cmd.Args is %+v \n", cmd.Args)
-		fmt.Printf("cmd output %s \n", string(data))
-		exErr, ok := err.(*exec.ExitError)
-		fmt.Printf("exErr is %+v and ok %+v \n", exErr, ok)
-		if ok {
-			fmt.Println(string(exErr.Stderr))
-		}
+	data, err := cmd.CombinedOutput()
+	fmt.Printf("comment on issue %d got %s and %+v \n", cfg.LinterCfg.Issue.ID, string(data), err)
+	if err != nil {
 		return fmt.Errorf("gh issue comment failed %w", err)
 	}
 	return nil

@@ -13,6 +13,9 @@ on:
         default: ""
         required: true
 
+permissions:
+  issues: write
+
 jobs:
   checker:
     runs-on: ubuntu-latest
