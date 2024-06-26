@@ -141,10 +141,10 @@ func excludeLine(c *Config, line string) bool {
 
 func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) error {
 	fmt.Println("create outputs issue to github issue")
-	body := fmt.Sprintf("Repo: %s\n```%s```", cfg.Repo, strings.Join(outputs, "\n"))
+	//body := fmt.Sprintf("Repo: %s\n```%s```", cfg.Repo, strings.Join(outputs, "\n"))
 	cmd := exec.CommandContext(ctx, "gh", "issue", "comment",
 		strconv.FormatInt(cfg.LinterCfg.Issue.ID, 10),
-		"--body", body)
+		"--body", "Testing")
 	cmd.Dir = "."
 	if data, err := cmd.CombinedOutput(); err != nil {
 		fmt.Printf("cmd is %+v \n", cmd)
