@@ -50,6 +50,7 @@ runs:
 
     - name: Test command
       run: gh issue list
+      shell: bash
       env:
         GH_TOKEN: ${{ inputs.GH_TOKEN }}
 
