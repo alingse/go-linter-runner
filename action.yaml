@@ -38,6 +38,10 @@ inputs:
     description: |
       If linter catch some output, it will post comment on the issue
     default: ''
+  GH_TOKEN:
+    description: |
+      If enabled issue_id, must set GH_TOKEN
+    default: ''
 
 runs:
   using: "composite"
@@ -46,7 +50,7 @@ runs:
 
     - run: Test command gh issue list
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ inputs.GH_TOKEN }}
 
     - name: Setup Go environment
       uses: actions/setup-go@v3.2.0
