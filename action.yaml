@@ -59,6 +59,10 @@ runs:
       with:
         go-version: ${{ inputs.go-version }}
 
+    - name: Show Files
+      run: ls -lh
+      shell: bash
+
 branding:
   icon: 'check'
   color: 'blue'
