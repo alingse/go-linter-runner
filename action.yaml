@@ -1,0 +1,58 @@
+name: 'Go linter Runner'
+description: 'Run linter on github repo and comment issue'
+author: 'alingse'
+inputs:
+  go-version:
+    description: |
+      Go Version
+      Default '1.22'
+    default: 1.22
+  workdir:
+    description: |
+      Work directory.
+      Default '.'
+    default: '.'
+  install_command:
+    description: |
+      The install command like 'go install xxx/xxx@yyy'
+    required: true
+  linter_command:
+    description: |
+      The lint command to run linter like 'xxlint --yy cc'
+    required: true
+  repo_url:
+    description: |
+      The repo to run lint, only work for github repo now
+    required: true
+  excludes:
+    description: |
+      The output must exclude string array, can set as regex
+    type: array
+    default: []
+  includes:
+    description: |
+      The output must include string array, can set as regex
+    type: array
+    default: []
+  issue_id:
+    description: |
+      If linter catch some output, it will post comment on the issue
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+
+    - run: Test command gh issue list
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Setup Go environment
+      uses: actions/setup-go@v3.2.0
+      with:
+        go-version: ${{ inputs.go-version }}
+
+branding:
+  icon: 'check'
+  color: 'blue'
