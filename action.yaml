@@ -48,7 +48,8 @@ runs:
   steps:
     - uses: actions/checkout@v3
 
-    - run: Test command gh issue list
+    - name: Test command
+      run: gh issue list
       env:
         GH_TOKEN: ${{ inputs.GH_TOKEN }}
 
