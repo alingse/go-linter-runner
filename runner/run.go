@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -13,31 +14,45 @@ import (
 
 var ErrSkipNoGoModRepo = errors.New("skip this repo for no go.mod file exists")
 
+func runCmd(cmd *exec.Cmd) error {
+	data, err := cmd.CombinedOutput()
+	fmt.Println(string(data))
+	if err != nil {
+		return fmt.Errorf("run %s %+v failed %w", cmd.Path, cmd.Args, err)
+	}
+	return nil
+}
+
 func Prepare(ctx context.Context, cfg *Config) error {
 	// install linter
-	args := strings.Split(cfg.LinterCfg.Install, " ")
+	args := strings.Fields(cfg.LinterCfg.InstallCommand)
 	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
 	cmd.Dir = cfg.LinterCfg.Workdir
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("install linter failed %w", err)
+	if err := runCmd(cmd); err != nil {
+		return err
 	}
+
 	// clone repo
-	cmd = exec.CommandContext(ctx, "git", "clone", cfg.Repo)
+	cmd = exec.CommandContext(ctx, "git", "clone", cfg.LinterCfg.RepoURL)
 	cmd.Dir = cfg.LinterCfg.Workdir
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("git clone failed %w  repo: %s", err, cfg.Repo)
+	if err := runCmd(cmd); err != nil {
+		return err
 	}
+
+	// TODO: check more deep
 	// check go.mod exists
 	gomodFile := path.Join(cfg.RepoDir, "go.mod")
 	if !isFileExists(gomodFile) {
 		return ErrSkipNoGoModRepo
 	}
+
 	// run go mod download
 	cmd = exec.CommandContext(ctx, "go", "mod", "download")
 	cmd.Dir = cfg.RepoDir
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("go mod download failed %w", err)
+	if err := runCmd(cmd); err != nil {
+		return err
 	}
+
 	// read default branch for repo
 	cmd = exec.CommandContext(ctx, "git", "branch", "--show-current")
 	cmd.Dir = cfg.RepoDir
@@ -50,13 +65,16 @@ func Prepare(ctx context.Context, cfg *Config) error {
 }
 
 func Run(ctx context.Context, cfg *Config) ([]string, error) {
-	cmd := exec.CommandContext(ctx, cfg.LinterCfg.Linter, "./...")
+	args := strings.Fields(cfg.LinterCfg.LinterCommand)
+	args = append(args, "./...")
+	cmd := exec.CommandContext(ctx, args[0], args...)
 	cmd.Dir = cfg.RepoDir
-	outputData, err := cmd.CombinedOutput()
-	output := string(outputData)
+	data, err := cmd.CombinedOutput()
+	output := string(data)
 	if err != nil && len(output) == 0 {
 		return nil, err
 	}
+
 	// check includes && excludes
 	outputs := strings.Split(output, "\n")
 	validOutputs := make([]string, 0, len(outputs))
@@ -73,13 +91,14 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 }
 
 func Parse(ctx context.Context, cfg *Config, outputs []string) []string {
-	target := cfg.Repo + "/blob/" + cfg.RepoBranch
+	target := cfg.LinterCfg.RepoURL + "/blob/" + cfg.RepoBranch
 	// replace local path to a github link
 	for i, line := range outputs {
 		if strings.Contains(line, cfg.RepoDir) {
 			outputs[i] = strings.ReplaceAll(line, cfg.RepoDir, target)
 		}
 	}
+
 	// process the example.go:7:6 -> #L7
 	for i, line := range outputs {
 		if strings.Contains(line, ".go:") {
@@ -92,8 +111,7 @@ func Parse(ctx context.Context, cfg *Config, outputs []string) []string {
 var divider = strings.Repeat(`=`, 100)
 
 func PrintOutput(ctx context.Context, cfg *Config, outputs []string) {
-	fmt.Printf("Run %s with linter `%s` got %d line outputs\n",
-		cfg.LinterCfg.Name, cfg.LinterCfg.Linter, len(outputs))
+	fmt.Printf("Run linter `%s` got %d line outputs\n", cfg.LinterCfg.LinterCommand, len(outputs))
 	fmt.Println(divider)
 	fmt.Printf("runner config: %+v\n", cfg)
 	fmt.Println(divider)
@@ -101,7 +119,7 @@ func PrintOutput(ctx context.Context, cfg *Config, outputs []string) {
 		fmt.Println(line)
 	}
 	fmt.Println(divider)
-	fmt.Printf("Report issue: %s/issues\n", cfg.Repo)
+	fmt.Printf("Report issue: %s/issues\n", cfg.LinterCfg.RepoURL)
 }
 
 func isFileExists(filename string) bool {
@@ -141,14 +159,14 @@ func excludeLine(c *Config, line string) bool {
 
 func buildIssueComment(cfg *Config, outputs []string) string {
 	var s strings.Builder
-	s.WriteString(fmt.Sprintf("Run `%s` on Repo: %s got output\n", cfg.LinterCfg.Linter, cfg.Repo))
+	s.WriteString(fmt.Sprintf("Run `%s` on Repo: %s got output\n", cfg.LinterCfg.LinterCommand, cfg.LinterCfg.RepoURL))
 	s.WriteString("```\n")
 	for _, o := range outputs {
 		s.WriteString(o)
 		s.WriteString("\n")
 	}
 	s.WriteString("```\n")
-	s.WriteString(fmt.Sprintf("Report issue: %s/issues\n", cfg.Repo))
+	s.WriteString(fmt.Sprintf("Report issue: %s/issues\n", cfg.LinterCfg.RepoURL))
 	s.WriteString(fmt.Sprintf("Github actions: %s", os.Getenv("GH_ACTION_LINK")))
 	return s.String()
 }
@@ -156,13 +174,9 @@ func buildIssueComment(cfg *Config, outputs []string) string {
 func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) error {
 	body := buildIssueComment(cfg, outputs)
 	cmd := exec.CommandContext(ctx, "gh", "issue", "comment",
-		strconv.FormatInt(cfg.LinterCfg.Issue.ID, 10),
+		strconv.FormatInt(cfg.LinterCfg.IssueID, 10),
 		"--body", body)
 	cmd.Dir = "."
-	data, err := cmd.CombinedOutput()
-	fmt.Printf("comment on issue %d got %s and %+v \n", cfg.LinterCfg.Issue.ID, string(data), err)
-	if err != nil {
-		return fmt.Errorf("gh issue comment failed %w", err)
-	}
-	return nil
+	log.Printf("comment on issue #%d\n", cfg.LinterCfg.IssueID)
+	return runCmd(cmd)
 }

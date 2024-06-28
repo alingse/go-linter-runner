@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	var cfg, err = runner.LoadCfg()
+	var cfg, err = runner.LoadCfg(os.Args[1])
 	if err != nil {
 		log.Fatal("load config failed: ", err)
 		return
@@ -23,13 +23,13 @@ func main() {
 
 	err = runner.Prepare(ctx, cfg)
 	if err != nil {
-		log.Println("failed in prepare linter:", err)
+		log.Fatal("failed in prepare linter:", err)
 		return
 	}
 
 	outputs, err := runner.Run(ctx, cfg)
 	if err != nil {
-		log.Println("failed in run linter:", err)
+		log.Fatal("failed in run linter:", err)
 		return
 	}
 	if len(outputs) == 0 {
@@ -37,17 +37,14 @@ func main() {
 		return
 	}
 
-	outputs = runner.Parse(ctx, cfg, outputs)
+	runner.Parse(ctx, cfg, outputs)
 	runner.PrintOutput(ctx, cfg, outputs)
 	// create comment on issue
-	if cfg.LinterCfg.Issue.Comment && cfg.LinterCfg.Issue.ID > 0 {
+	if cfg.LinterCfg.IssueID > 0 {
 		err = runner.CreateIssueComment(ctx, cfg, outputs)
 		if err != nil {
-			log.Printf("failed to SaveOutputs err %+v \n", err)
+			log.Fatalf("failed to CreateIssueComment err %+v \n", err)
 			return
 		}
-	}
-	if cfg.LinterCfg.ExitFail {
-		os.Exit(1)
 	}
 }

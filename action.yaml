@@ -2,7 +2,7 @@ name: 'Go linter Runner'
 description: 'Run linter on github repo and comment issue'
 author: 'alingse'
 inputs:
-  go-version:
+  go_version:
     description: |
       Go Version
       Default '1.22'
@@ -55,7 +55,7 @@ runs:
     - name: Setup Go environment
       uses: actions/setup-go@v3.2.0
       with:
-        go-version: ${{ inputs.go-version }}
+        go-version: ${{ inputs.go_version }}
 
     - name: Build Go executable
       run: |
@@ -66,10 +66,10 @@ runs:
       shell: bash
 
     - name: Run the executable
-      run: |
-        ls -lh
-        /usr/local/bin/go-linter-runner
+      run: go-linter-runner '${{ inputs }}'
       shell: bash
+      with:
+        GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
 branding:
   icon: 'check'
