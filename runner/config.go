@@ -2,6 +2,7 @@ package runner
 
 import (
 	"encoding/json"
+	"log"
 	"net/url"
 	"os"
 	"path"
@@ -17,14 +18,14 @@ type Config struct {
 }
 
 type LinterCfg struct {
-	Workdir        string   `json:"workdir"`
-	LinterCommand  string   `json:"linter_command"`
-	InstallCommand string   `json:"install_command"`
-	RepoURL        string   `json:"repo_url"`
-	Includes       []string `json:"includes"`
-	Excludes       []string `json:"excludes"`
-	IssueID        int64    `json:"issue_id"`
-	Timeout        int64    `json:"timeout"`
+	Workdir        string `json:"workdir"`
+	LinterCommand  string `json:"linter_command"`
+	InstallCommand string `json:"install_command"`
+	RepoURL        string `json:"repo_url"`
+	Includes       any    `json:"includes"`
+	Excludes       any    `json:"excludes"`
+	IssueID        int64  `json:"issue_id"`
+	Timeout        int64  `json:"timeout"`
 }
 
 func LoadCfg(arg string) (*Config, error) {
@@ -62,4 +63,31 @@ func (c *Config) GetTimeout(defaultDuration time.Duration) time.Duration {
 		return time.Duration(c.LinterCfg.Timeout) * time.Second
 	}
 	return defaultDuration
+}
+
+func parseStringArray(s any) []string {
+	var ss []string
+	switch value := s.(type) {
+	case string:
+		if value == "" || value == "[]" {
+			return ss
+		}
+		err := json.Unmarshal([]byte(value), &ss)
+		if err != nil {
+			log.Printf("parse value %s to string array failed %+v\n", value, err)
+		}
+		return ss
+	case []any:
+		if len(value) > 0 {
+			data, _ := json.Marshal(ss)
+			_ = json.Unmarshal(data, &ss)
+			return ss
+		}
+	case []string:
+		return value
+	default:
+		log.Printf("parse value %+v to string array failed\n", value)
+	}
+	return ss
+
 }

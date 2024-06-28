@@ -28,10 +28,12 @@ inputs:
     description: |
       The output must exclude string array, can set as regex
     type: array
+    default: []
   includes:
     description: |
       The output must include string array, can set as regex
     type: array
+    default: '[]'
   issue_id:
     description: |
       If linter catch some output, it will post comment on the issue

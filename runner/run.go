@@ -78,12 +78,15 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	// check includes && excludes
 	outputs := strings.Split(output, "\n")
 	validOutputs := make([]string, 0, len(outputs))
+
+	includes := parseStringArray(cfg.LinterCfg.Includes)
+	excludes := parseStringArray(cfg.LinterCfg.Excludes)
 	for _, line := range outputs {
 		line := strings.TrimSpace(line)
 		if len(line) == 0 {
 			continue
 		}
-		if includeLine(cfg, line) && !excludeLine(cfg, line) {
+		if includeLine(includes, line) && !excludeLine(excludes, line) {
 			validOutputs = append(validOutputs, line)
 		}
 	}
@@ -133,11 +136,11 @@ func isFileExists(filename string) bool {
 	return true
 }
 
-func includeLine(c *Config, line string) bool {
-	if len(c.LinterCfg.Includes) == 0 {
+func includeLine(includes []string, line string) bool {
+	if len(includes) == 0 {
 		return true
 	}
-	for _, v := range c.LinterCfg.Includes {
+	for _, v := range includes {
 		if strings.Contains(line, v) {
 			return true
 		}
@@ -145,11 +148,11 @@ func includeLine(c *Config, line string) bool {
 	return false
 }
 
-func excludeLine(c *Config, line string) bool {
-	if len(c.LinterCfg.Excludes) == 0 {
+func excludeLine(excludes []string, line string) bool {
+	if len(excludes) == 0 {
 		return false
 	}
-	for _, v := range c.LinterCfg.Excludes {
+	for _, v := range excludes {
 		if strings.Contains(line, v) {
 			return true
 		}
