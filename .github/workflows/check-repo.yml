@@ -1,3 +1,4 @@
+name: check-repo
 run-name: "run `makezero` for ${{github.event.inputs.repo_url}}"
 
 on:
