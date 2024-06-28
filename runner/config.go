@@ -22,8 +22,8 @@ type LinterCfg struct {
 	LinterCommand  string `json:"linter_command"`
 	InstallCommand string `json:"install_command"`
 	RepoURL        string `json:"repo_url"`
-	Includes       any    `json:"includes"`
-	Excludes       any    `json:"excludes"`
+	Includes       string `json:"includes"`
+	Excludes       string `json:"excludes"`
 	IssueID        int64  `json:"issue_id"`
 	Timeout        int64  `json:"timeout"`
 }
@@ -65,29 +65,14 @@ func (c *Config) GetTimeout(defaultDuration time.Duration) time.Duration {
 	return defaultDuration
 }
 
-func parseStringArray(s any) []string {
+func parseStringArray(s string) []string {
 	var ss []string
-	switch value := s.(type) {
-	case string:
-		if value == "" || value == "[]" {
-			return ss
-		}
-		err := json.Unmarshal([]byte(value), &ss)
-		if err != nil {
-			log.Printf("parse value %s to string array failed %+v\n", value, err)
-		}
+	if s == "" || s == "[]" {
 		return ss
-	case []any:
-		if len(value) > 0 {
-			data, _ := json.Marshal(ss)
-			_ = json.Unmarshal(data, &ss)
-			return ss
-		}
-	case []string:
-		return value
-	default:
-		log.Printf("parse value %+v to string array failed\n", value)
+	}
+	err := json.Unmarshal([]byte(s), &ss)
+	if err != nil {
+		log.Printf("parse value %s to string array failed %+v\n", s, err)
 	}
 	return ss
-
 }
