@@ -68,7 +68,7 @@ runs:
     - name: Run the executable
       run: go-linter-runner '${{ inputs }}'
       shell: bash
-      with:
+      env:
         GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
 branding:
