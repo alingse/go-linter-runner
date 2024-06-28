@@ -58,7 +58,7 @@ runs:
         go-version: ${{ inputs.go-version }}
 
     - name: Build Go executable
-      run: go build -o go-linter-runner main.go
+      run: go build -o go-linter-runner $GITHUB_ACTION_PATH/main.go
       shell: bash
 
     - name: Run the executable
