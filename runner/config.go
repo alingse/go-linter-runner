@@ -2,7 +2,6 @@ package runner
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -26,8 +25,8 @@ type LinterCfg struct {
 	RepoURL        string `json:"repo_url"`
 	Includes       string `json:"includes"`
 	Excludes       string `json:"excludes"`
-	IssueID        any    `json:"issue_id"`
-	Timeout        any    `json:"timeout"`
+	IssueID        string `json:"issue_id"`
+	Timeout        string `json:"timeout"`
 }
 
 func LoadCfg(arg string) (*Config, error) {
@@ -61,21 +60,13 @@ func LoadCfg(arg string) (*Config, error) {
 }
 
 func (c *Config) GetTimeout(defaultDuration time.Duration) time.Duration {
-	if c.LinterCfg.Timeout != nil {
-		timeout, _ := strconv.ParseInt(fmt.Sprintf("%v", c.LinterCfg.Timeout), 10, 64)
+	if c.LinterCfg.Timeout != "" {
+		timeout, _ := strconv.ParseInt(c.LinterCfg.Timeout, 10, 64)
 		if timeout > 0 {
 			return time.Duration(timeout) * time.Second
 		}
 	}
 	return defaultDuration
-}
-
-func (c *Config) GetIssueID() int64 {
-	if c.LinterCfg.IssueID == nil {
-		return 0
-	}
-	issueID, _ := strconv.ParseInt(fmt.Sprintf("%v", c.LinterCfg.IssueID), 10, 64)
-	return issueID
 }
 
 func parseStringArray(s string) []string {

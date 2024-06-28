@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"strconv"
 	"strings"
 )
 
@@ -177,9 +176,9 @@ func buildIssueComment(cfg *Config, outputs []string) string {
 func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) error {
 	body := buildIssueComment(cfg, outputs)
 	cmd := exec.CommandContext(ctx, "gh", "issue", "comment",
-		strconv.FormatInt(cfg.GetIssueID(), 10),
+		cfg.LinterCfg.IssueID,
 		"--body", body)
 	cmd.Dir = "."
-	log.Printf("comment on issue #%d\n", cfg.LinterCfg.IssueID)
+	log.Printf("comment on issue #%s\n", cfg.LinterCfg.IssueID)
 	return runCmd(cmd)
 }
