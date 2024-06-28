@@ -15,11 +15,9 @@ inputs:
   install_command:
     description: |
       The install command like 'go install xxx/xxx@yyy'
-    required: true
   linter_command:
     description: |
       The lint command to run linter like 'xxlint --yy cc'
-    required: true
   repo_url:
     description: |
       The repo to run lint, only work for github repo now

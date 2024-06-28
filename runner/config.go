@@ -40,6 +40,9 @@ func LoadCfg(arg string) (*Config, error) {
 	}
 
 	// make workdir abs
+	if cfg.LinterCfg.Workdir == "" {
+		cfg.LinterCfg.Workdir = "."
+	}
 	if !path.IsAbs(cfg.LinterCfg.Workdir) {
 		cwd, err := os.Getwd()
 		if err != nil {
