@@ -16,7 +16,7 @@ jobs:
   go-linter-runner-for-repo:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: alingse/go-linter-runner@main
         with:
           install_command: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd

@@ -1,0 +1,20 @@
+name: submit-repos
+run-name: "submit check-repo.yml"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Trigger check-repo workflow
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        run: |
+          gh auth login --with-token <<< "$GH_TOKEN"
+          gh workflow run check-repo.yaml --ref main
