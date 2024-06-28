@@ -13,7 +13,7 @@ permissions:
   issues: write
 
 jobs:
-  use-composite-action:
+  go-linter-runner-for-repo:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
