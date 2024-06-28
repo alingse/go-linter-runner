@@ -40,7 +40,7 @@ func main() {
 	runner.Parse(ctx, cfg, outputs)
 	runner.PrintOutput(ctx, cfg, outputs)
 	// create comment on issue
-	if cfg.LinterCfg.IssueID > 0 {
+	if cfg.GetIssueID() > 0 {
 		err = runner.CreateIssueComment(ctx, cfg, outputs)
 		if err != nil {
 			log.Fatalf("failed to CreateIssueComment err %+v \n", err)

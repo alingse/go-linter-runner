@@ -177,7 +177,7 @@ func buildIssueComment(cfg *Config, outputs []string) string {
 func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) error {
 	body := buildIssueComment(cfg, outputs)
 	cmd := exec.CommandContext(ctx, "gh", "issue", "comment",
-		strconv.FormatInt(cfg.LinterCfg.IssueID, 10),
+		strconv.FormatInt(cfg.GetIssueID(), 10),
 		"--body", body)
 	cmd.Dir = "."
 	log.Printf("comment on issue #%d\n", cfg.LinterCfg.IssueID)
