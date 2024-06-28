@@ -1,8 +1,12 @@
-name: Main Workflow
+run-name: "run `makezero` for ${{github.event.inputs.repo_url}}"
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      repo_url:
+        description: "the repo to check"
+        default: "https://github.com/alingse/makezero"
+        required: true
 
 permissions:
   issues: write
