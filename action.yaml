@@ -58,11 +58,17 @@ runs:
         go-version: ${{ inputs.go-version }}
 
     - name: Build Go executable
-      run: go build -o go-linter-runner $GITHUB_ACTION_PATH/main.go
+      run: |
+        ls -lh $GITHUB_ACTION_PATH
+        cd $GITHUB_ACTION_PATH
+        go build -o go-linter-runner main.go
+        mv go-linter-runner /usr/local/bin/go-linter-runner
       shell: bash
 
     - name: Run the executable
-      run: ./go-linter-runner
+      run: |
+        ls -lh
+        /usr/local/bin/go-linter-runner
       shell: bash
 
 branding:
