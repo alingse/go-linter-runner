@@ -4,6 +4,9 @@ run-name: "submit check-repo.yml"
 on:
   workflow_dispatch:
 
+permissions:
+  actions: write
+
 jobs:
   submit:
     runs-on: ubuntu-latest
