@@ -43,8 +43,6 @@ runs:
     - name: Test command
       run: gh issue list
       shell: bash
-      env:
-        GH_TOKEN: ${{ inputs.GH_TOKEN }}
 
     - name: Setup Go environment
       uses: actions/setup-go@v3.2.0
