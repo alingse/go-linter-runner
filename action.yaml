@@ -36,10 +36,6 @@ inputs:
     description: |
       If linter catch some output, it will post comment on the issue
     default: ''
-  GH_TOKEN:
-    description: |
-      If enabled issue_id, must set GH_TOKEN
-    default: ''
 
 runs:
   using: "composite"
@@ -67,6 +63,7 @@ runs:
       run: go-linter-runner '${{ toJson(inputs) }}'
       shell: bash
       env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
 branding:
