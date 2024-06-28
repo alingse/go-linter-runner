@@ -38,24 +38,18 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Test command
-      run: gh issue list
-      shell: bash
-
     - name: Setup Go environment
       uses: actions/setup-go@v3.2.0
       with:
         go-version: ${{ inputs.go_version }}
 
-    - name: Build Go executable
+    - name: Build go-linter-runner
       run: |
-        ls -lh $GITHUB_ACTION_PATH
         cd $GITHUB_ACTION_PATH
-        go build -o go-linter-runner main.go
-        mv go-linter-runner /usr/local/bin/go-linter-runner
+        go build -o /usr/local/bin/go-linter-runner main.go
       shell: bash
 
-    - name: Run the executable
+    - name: Run go-linter-runner
       run: go-linter-runner '${{ toJson(inputs) }}'
       shell: bash
       env:
