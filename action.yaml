@@ -63,7 +63,6 @@ runs:
       run: go-linter-runner '${{ toJson(inputs) }}'
       shell: bash
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
 branding:
