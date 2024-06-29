@@ -2,7 +2,6 @@ package run
 
 import (
 	"encoding/json"
-	"log"
 	"net/url"
 	"os"
 	"path"
@@ -25,8 +24,8 @@ type LinterCfg struct {
 	Workdir        string `json:"workdir"`
 	LinterCommand  string `json:"linter_command"`
 	InstallCommand string `json:"install_command"`
-	Includes       string `json:"includes"`
-	Excludes       string `json:"excludes"`
+	Includes       any    `json:"includes"`
+	Excludes       any    `json:"excludes"`
 	IssueID        string `json:"issue_id"`
 	Timeout        string `json:"timeout"`
 }
@@ -78,16 +77,4 @@ func (c *Config) GetTimeout(defaultDuration time.Duration) time.Duration {
 		}
 	}
 	return defaultDuration
-}
-
-func parseStringArray(s string) []string {
-	var ss []string
-	if s == "" || s == "[]" {
-		return ss
-	}
-	err := json.Unmarshal([]byte(s), &ss)
-	if err != nil {
-		log.Printf("parse value %s to string array failed %+v\n", s, err)
-	}
-	return ss
 }

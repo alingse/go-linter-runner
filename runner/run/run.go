@@ -80,8 +80,8 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	outputs := strings.Split(output, "\n")
 	validOutputs := make([]string, 0, len(outputs))
 
-	includes := parseStringArray(cfg.LinterCfg.Includes)
-	excludes := parseStringArray(cfg.LinterCfg.Excludes)
+	includes := utils.GetStringArray(cfg.LinterCfg.Includes)
+	excludes := utils.GetStringArray(cfg.LinterCfg.Excludes)
 	for _, line := range outputs {
 		line := strings.TrimSpace(line)
 		if len(line) == 0 {
