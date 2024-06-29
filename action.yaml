@@ -87,6 +87,13 @@ runs:
       env:
         GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
+    - name: Execute submit job
+      if: ${{ inputs.action == 'submit' }}
+      run: go-linter-runner submit
+      shell: bash
+      env:
+        GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
 branding:
   icon: 'check'
   color: 'blue'
