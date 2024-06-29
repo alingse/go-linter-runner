@@ -78,7 +78,7 @@ runs:
 
     - name: Execute run job
       if: ${{ inputs.action == 'run' }}
-      run: go-linter-runner run --yaml ${{ inputs.yaml_config }} --repo '{{ inputs.repo_url }}'  --json '${{ toJson(inputs) }}'
+      run: go-linter-runner run --yaml ${{ inputs.yaml_config }} --repo ${{ inputs.repo_url }}  --json '${{ toJson(inputs) }}'
       shell: bash
       env:
         GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
