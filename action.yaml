@@ -80,7 +80,8 @@ runs:
         go build -o /usr/local/bin/go-linter-runner main.go
       shell: bash
 
-    - name: Run go-linter-runner
+    - name: Execute run job
+      if: ${{ inputs.action == 'run' }}
       run: go-linter-runner run --yaml yaml_config --json '${{ toJson(inputs) }}'
       shell: bash
       env:
