@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"os"
+	"strings"
 )
 
 func IsFileExists(filename string) bool {
@@ -33,4 +34,12 @@ func GetStringArray(s any) (ss []string) {
 		_ = json.Unmarshal(data, &ss)
 	}
 	return
+}
+
+func SplitCommand(command string) (name string, args []string) {
+	fields := strings.Fields(command)
+	if len(fields) == 1 {
+		return fields[0], nil
+	}
+	return fields[0], fields[1:]
 }

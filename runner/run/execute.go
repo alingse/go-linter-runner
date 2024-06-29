@@ -26,8 +26,8 @@ func runCmd(cmd *exec.Cmd) error {
 
 func Prepare(ctx context.Context, cfg *Config) error {
 	// install linter
-	args := strings.Fields(cfg.LinterCfg.InstallCommand)
-	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
+	name, args := utils.SplitCommand(cfg.LinterCfg.InstallCommand)
+	cmd := exec.CommandContext(ctx, name, args...)
 	cmd.Dir = cfg.LinterCfg.Workdir
 	if err := runCmd(cmd); err != nil {
 		return err
@@ -66,9 +66,9 @@ func Prepare(ctx context.Context, cfg *Config) error {
 }
 
 func Run(ctx context.Context, cfg *Config) ([]string, error) {
-	args := strings.Fields(cfg.LinterCfg.LinterCommand)
+	name, args := utils.SplitCommand(cfg.LinterCfg.LinterCommand)
 	args = append(args, "./...")
-	cmd := exec.CommandContext(ctx, args[0], args...)
+	cmd := exec.CommandContext(ctx, name, args...)
 	cmd.Dir = cfg.RepoDir
 	data, err := cmd.CombinedOutput()
 	output := string(data)
