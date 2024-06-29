@@ -2,6 +2,7 @@ package run
 
 import (
 	"encoding/json"
+	"errors"
 	"net/url"
 	"os"
 	"path"
@@ -66,6 +67,14 @@ func LoadCfg(repo, jsonCfg, yamlCfg string) (*Config, error) {
 
 	_, lastDir := path.Split(cfg.RepoURL.Path)
 	cfg.RepoDir = path.Join(cfg.LinterCfg.Workdir, lastDir)
+
+	// TODO: check more
+	if cfg.LinterCfg.InstallCommand == "" {
+		return nil, errors.New("install_command is empty")
+	}
+	if cfg.LinterCfg.LinterCommand == "" {
+		return nil, errors.New("linter_command is empty")
+	}
 	return cfg, nil
 }
 
