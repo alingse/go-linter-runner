@@ -2,7 +2,7 @@ package run
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"net/url"
 	"os"
 	"path"
@@ -22,13 +22,13 @@ type Config struct {
 }
 
 type LinterCfg struct {
-	Workdir        string `json:"workdir"`
-	LinterCommand  string `json:"linter_command"`
-	InstallCommand string `json:"install_command"`
-	Includes       any    `json:"includes"`
-	Excludes       any    `json:"excludes"`
-	IssueID        string `json:"issue_id"`
-	Timeout        string `json:"timeout"`
+	Workdir        string `json:"workdir"         yaml:"workdir"`
+	LinterCommand  string `json:"linter_command"  yaml:"linter_command"`
+	InstallCommand string `json:"install_command" yaml:"install_command"`
+	Includes       any    `json:"includes"        yaml:"includes"`
+	Excludes       any    `json:"excludes"        yaml:"excludes"`
+	IssueID        string `json:"issue_id"        yaml:"issue_id"`
+	Timeout        string `json:"timeout"         yaml:"timeout"`
 }
 
 func LoadCfg(repo, jsonCfg, yamlCfg string) (*Config, error) {
@@ -70,10 +70,10 @@ func LoadCfg(repo, jsonCfg, yamlCfg string) (*Config, error) {
 
 	// TODO: check more
 	if cfg.LinterCfg.InstallCommand == "" {
-		return nil, errors.New("install_command is empty")
+		return nil, fmt.Errorf("install_command is empty %+v", cfg)
 	}
 	if cfg.LinterCfg.LinterCommand == "" {
-		return nil, errors.New("linter_command is empty")
+		return nil, fmt.Errorf("linter_command is empty %+v", cfg)
 	}
 	return cfg, nil
 }
