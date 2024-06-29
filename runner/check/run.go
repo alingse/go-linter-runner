@@ -1,4 +1,4 @@
-package runner
+package check
 
 import (
 	"context"
@@ -9,6 +9,8 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+
+	"github.com/alingse/go-linter-runner/runner/utils"
 )
 
 var ErrSkipNoGoModRepo = errors.New("skip this repo for no go.mod file exists")
@@ -41,7 +43,7 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	// TODO: check more deep
 	// check go.mod exists
 	gomodFile := path.Join(cfg.RepoDir, "go.mod")
-	if !isFileExists(gomodFile) {
+	if !utils.IsFileExists(gomodFile) {
 		return ErrSkipNoGoModRepo
 	}
 
@@ -122,17 +124,6 @@ func PrintOutput(ctx context.Context, cfg *Config, outputs []string) {
 	}
 	fmt.Println(divider)
 	fmt.Printf("Report issue: %s/issues\n", cfg.LinterCfg.RepoURL)
-}
-
-func isFileExists(filename string) bool {
-	_, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	if err != nil {
-		return false
-	}
-	return true
 }
 
 func includeLine(includes []string, line string) bool {
