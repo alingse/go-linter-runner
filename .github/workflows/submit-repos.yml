@@ -1,5 +1,5 @@
 name: submit-repos
-run-name: "submit check-repo.yml"
+run-name: "submit repo urls for run-repo.yml"
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Trigger check-repo workflow
-        run: gh workflow run check-repo.yml --ref main
+      - name: Trigger run-repo workflow
+        run: gh workflow run run-repo.yml --ref main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

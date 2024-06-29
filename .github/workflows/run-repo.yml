@@ -1,0 +1,40 @@
+name: run-repo
+run-name: "run `makezero` for ${{github.event.inputs.repo_url}}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo_url:
+        description: "the repo to run linter"
+        default: "https://github.com/alingse/makezero"
+        required: true
+
+permissions:
+  issues: write
+
+jobs:
+  go-linter-runner-for-repo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: example -> go-linter-runner use direct job config
+        uses: alingse/go-linter-runner@main
+        with:
+          action: run
+          install_command: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
+          linter_command: makezero
+          includes: '["go", "github"]'
+          issue_id: 1
+          repo_url: ${{ inputs.repo_url }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: example -> go-linter-runner run with yaml job config
+        uses: alingse/go-linter-runner@main
+        with:
+          action: run
+          yaml_config: jobs/alingse-makezero.yaml
+          repo_url: ${{ inputs.repo_url }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
