@@ -18,6 +18,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: example -> go-linter-runner run with yaml job config
+        uses: alingse/go-linter-runner@main
+        with:
+          action: run
+          yaml_config: jobs/alingse-makezero.yaml
+          repo_url: ${{ inputs.repo_url }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: example -> go-linter-runner use direct job config
         uses: alingse/go-linter-runner@main
         with:
@@ -26,15 +35,6 @@ jobs:
           linter_command: makezero
           includes: '["go", "github"]'
           issue_id: 1
-          repo_url: ${{ inputs.repo_url }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: example -> go-linter-runner run with yaml job config
-        uses: alingse/go-linter-runner@main
-        with:
-          action: run
-          yaml_config: jobs/alingse-makezero.yaml
           repo_url: ${{ inputs.repo_url }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
