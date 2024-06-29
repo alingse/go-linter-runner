@@ -34,6 +34,11 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	}
 
 	// clone repo
+	cmd = exec.CommandContext(ctx, "rm", "-rf", cfg.RepoDir)
+	cmd.Dir = cfg.LinterCfg.Workdir
+	if err := runCmd(cmd); err != nil {
+		return err
+	}
 	cmd = exec.CommandContext(ctx, "git", "clone", cfg.Repo)
 	cmd.Dir = cfg.LinterCfg.Workdir
 	if err := runCmd(cmd); err != nil {
