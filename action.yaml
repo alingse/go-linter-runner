@@ -76,9 +76,16 @@ runs:
         go build -o /usr/local/bin/go-linter-runner main.go
       shell: bash
 
-    - name: Execute run job
-      if: ${{ inputs.action == 'run' }}
-      run: go-linter-runner run --yaml ${{ inputs.yaml_config }} --repo ${{ inputs.repo_url }}  --json '${{ toJson(inputs) }}'
+    - name: Execute run job with yaml config
+      if: ${{ inputs.action == 'run' && inputs.yaml_config != '' }}
+      run: go-linter-runner run --repo ${{ inputs.repo_url }} --yaml '${{ inputs.yaml_config }}'
+      shell: bash
+      env:
+        GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+    - name: Execute run job with no-yaml config
+      if: ${{ inputs.action == 'run' && inputs.yaml_config == '' }}
+      run: go-linter-runner run --repo ${{ inputs.repo_url }} --json '${{ toJson(inputs) }}'
       shell: bash
       env:
         GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
