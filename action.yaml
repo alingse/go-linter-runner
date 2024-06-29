@@ -7,6 +7,19 @@ inputs:
       Go Version
       Default '1.22'
     default: 1.22
+  action:
+    description: |
+      'run' or 'submit'
+      Default 'run'
+    default: 'run'
+  json_config:
+    description: |
+      the json style config file
+    default: ''
+  yaml_config:
+    description: |
+      the yaml style config file
+    default: ''
   workdir:
     description: |
       Work directory.
@@ -50,7 +63,7 @@ runs:
       shell: bash
 
     - name: Run go-linter-runner
-      run: go-linter-runner '${{ toJson(inputs) }}'
+      run: go-linter-runner run --json '${{ toJson(inputs) }}'
       shell: bash
       env:
         GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"

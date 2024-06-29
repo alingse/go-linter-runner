@@ -34,8 +34,8 @@ var repoURLPtr *string
 
 func init() {
 	rootCmd.AddCommand(checkCmd)
-	jsonConfigPtr = checkCmd.Flags().StringP("-json", "j", "", "a json config file or a json config string")
-	yamlConfigPtr = checkCmd.Flags().StringP("-yaml", "y", "", "a yaml config file or a yaml config string")
+	jsonConfigPtr = checkCmd.Flags().StringP("json", "j", "", "a json config file or a json config string")
+	yamlConfigPtr = checkCmd.Flags().StringP("yaml", "y", "", "a yaml config file or a yaml config string")
 	repoURLPtr = checkCmd.Flags().StringP("repo", "r", "", "the repo needs to lint")
 }
 

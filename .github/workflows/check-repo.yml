@@ -17,7 +17,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: alingse/go-linter-runner@main
+
+      - name: go-linter-runner use direct config
+        uses: alingse/go-linter-runner@main
+        with:
+          install_command: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
+          linter_command: makezero
+          repo_url: https://github.com/alingse/makezero
+          includes: '["go", "github"]'
+          issue_id: 1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: go-linter-runner use yaml config
+        uses: alingse/go-linter-runner@main
         with:
           install_command: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
           linter_command: makezero
