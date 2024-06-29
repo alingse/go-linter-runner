@@ -23,7 +23,9 @@ inputs:
   submit_file:
     description: |
       the repo url file for 'submit' action
-      can be ``
+      can be the file name in https://github.com/alingse/go-linter-runner/blob/main/source/ dir
+      or other file link.
+      Default 'top1k'
     default: 'top1k'
   workdir:
     description: |
