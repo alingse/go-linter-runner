@@ -14,12 +14,17 @@ inputs:
     default: 'run'
   json_config:
     description: |
-      the json style config file
+      the json style config file for 'run' action
     default: ''
   yaml_config:
     description: |
-      the yaml style config file
+      the yaml style config file for 'run' action
     default: ''
+  submit_file:
+    description: |
+      the repo url file for 'submit' action
+      can be ``
+    default: 'top1k'
   workdir:
     description: |
       Work directory.
