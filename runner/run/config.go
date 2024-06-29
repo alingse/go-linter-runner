@@ -19,6 +19,7 @@ type Config struct {
 	RepoURL    *url.URL
 	RepoDir    string
 	RepoBranch string
+	RepoTarget string
 }
 
 type LinterCfg struct {

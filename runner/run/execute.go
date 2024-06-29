@@ -67,6 +67,7 @@ func Prepare(ctx context.Context, cfg *Config) error {
 		return fmt.Errorf("git branch failed %w", err)
 	}
 	cfg.RepoBranch = strings.TrimSpace(string(output))
+	cfg.RepoTarget = cfg.Repo + "/blob/" + cfg.RepoBranch
 	return nil
 }
 
@@ -100,11 +101,10 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 }
 
 func Parse(ctx context.Context, cfg *Config, outputs []string) []string {
-	target := cfg.Repo + "/blob/" + cfg.RepoBranch
 	// replace local path to a github link
 	for i, line := range outputs {
 		if strings.Contains(line, cfg.RepoDir) {
-			outputs[i] = strings.ReplaceAll(line, cfg.RepoDir, target)
+			outputs[i] = strings.ReplaceAll(line, cfg.RepoDir, cfg.RepoTarget)
 		}
 	}
 
@@ -157,16 +157,46 @@ func excludeLine(excludes []string, line string) bool {
 
 func buildIssueComment(cfg *Config, outputs []string) string {
 	var s strings.Builder
-	s.WriteString(fmt.Sprintf("Run `%s` on Repo: %s got output\n", cfg.LinterCfg.LinterCommand, cfg.Repo))
-	s.WriteString("```\n")
-	for _, o := range outputs {
-		s.WriteString(o)
-		s.WriteString("\n")
+	s.WriteString(fmt.Sprintf("Run `%s` on Repo: %s\n", cfg.LinterCfg.LinterCommand, cfg.Repo))
+	s.WriteString("\n")
+	s.WriteString(fmt.Sprintf("Got total %d line output in action: %s", len(outputs), os.Getenv("GH_ACTION_LINK")))
+	s.WriteString("\n")
+	s.WriteString("<details>\n")
+	s.WriteString("<summary>Expand</summary>\n\n")
+	for i, line := range outputs {
+		text := buildIssueCommentLine(cfg, line)
+		s.WriteString(fmt.Sprintf("%d. %s\n", i+1, text))
 	}
-	s.WriteString("```\n")
+	s.WriteString("\n")
+	s.WriteString("</details>\n\n")
 	s.WriteString(fmt.Sprintf("Report issue: %s/issues\n", cfg.Repo))
-	s.WriteString(fmt.Sprintf("Github actions: %s", os.Getenv("GH_ACTION_LINK")))
 	return s.String()
+}
+
+func buildIssueCommentLine(cfg *Config, line string) string {
+	codePath, other := buildIssueCommentLineSplit(cfg, line)
+	if codePath == "" {
+		return line
+	}
+	pathText := strings.TrimLeft(strings.ReplaceAll(codePath, cfg.RepoTarget, ""), "/:")
+	return fmt.Sprintf("[%s](%s) %s", pathText, codePath, other)
+}
+
+func buildIssueCommentLineSplit(cfg *Config, line string) (codePath string, other string) {
+	index := strings.Index(line, cfg.RepoTarget)
+	if index < 0 {
+		return "", line
+	}
+	other = line[:index]
+	tail := line[index:len(line)]
+	index = strings.Index(tail, " ")
+	if index < 0 {
+		codePath = tail
+		return strings.TrimSpace(codePath), strings.TrimSpace(other)
+	}
+	codePath = tail[:index]
+	other += tail[index:len(tail)]
+	return strings.TrimSpace(codePath), strings.TrimSpace(other)
 }
 
 func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) error {
