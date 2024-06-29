@@ -188,14 +188,14 @@ func buildIssueCommentLineSplit(cfg *Config, line string) (codePath string, othe
 		return "", line
 	}
 	other = line[:index]
-	tail := line[index:len(line)]
+	tail := line[index:]
 	index = strings.Index(tail, " ")
 	if index < 0 {
 		codePath = tail
 		return strings.TrimSpace(codePath), strings.TrimSpace(other)
 	}
 	codePath = tail[:index]
-	other += tail[index:len(tail)]
+	other += tail[index:]
 	return strings.TrimSpace(codePath), strings.TrimSpace(other)
 }
 
