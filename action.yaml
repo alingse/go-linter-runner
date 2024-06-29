@@ -12,10 +12,6 @@ inputs:
       'run' or 'submit'
       Default 'run'
     default: 'run'
-  json_config:
-    description: |
-      'run' option: the json style config file for 'run' action
-    default: ''
   yaml_config:
     description: |
       'run' option: the yaml style config file for 'run' action
@@ -82,7 +78,7 @@ runs:
 
     - name: Execute run job
       if: ${{ inputs.action == 'run' }}
-      run: go-linter-runner run --yaml yaml_config --json '${{ toJson(inputs) }}'
+      run: go-linter-runner run --yaml ${{ inputs.yaml_config }} --repo '{{ inputs.repo_url }}'  --json '${{ toJson(inputs) }}'
       shell: bash
       env:
         GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"

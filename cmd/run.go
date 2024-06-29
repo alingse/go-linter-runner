@@ -16,14 +16,15 @@ var runCmd = &cobra.Command{
 		yamlData, _ := os.ReadFile(*yamlConfigPtr)
 		yamlConfig := string(yamlData)
 		jsonConfig := *jsonConfigPtr
-		if jsonConfig == "" && yamlConfig == "" {
+		if yamlConfig == "" && jsonConfig == "" {
 			return fmt.Errorf("one of the options -y and -j must be set.")
 		}
+
 		repo := *repoURLPtr
 		if repo == "" {
 			return fmt.Errorf("the -r/--repo muest be set.")
 		}
-		runner.Run()
+		runner.Run(repo, jsonConfig, yamlConfig)
 		return nil
 	},
 }

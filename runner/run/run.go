@@ -34,7 +34,7 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	}
 
 	// clone repo
-	cmd = exec.CommandContext(ctx, "git", "clone", cfg.LinterCfg.RepoURL)
+	cmd = exec.CommandContext(ctx, "git", "clone", cfg.Repo)
 	cmd.Dir = cfg.LinterCfg.Workdir
 	if err := runCmd(cmd); err != nil {
 		return err
@@ -95,7 +95,7 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 }
 
 func Parse(ctx context.Context, cfg *Config, outputs []string) []string {
-	target := cfg.LinterCfg.RepoURL + "/blob/" + cfg.RepoBranch
+	target := cfg.Repo + "/blob/" + cfg.RepoBranch
 	// replace local path to a github link
 	for i, line := range outputs {
 		if strings.Contains(line, cfg.RepoDir) {
@@ -123,7 +123,7 @@ func PrintOutput(ctx context.Context, cfg *Config, outputs []string) {
 		fmt.Println(line)
 	}
 	fmt.Println(divider)
-	fmt.Printf("Report issue: %s/issues\n", cfg.LinterCfg.RepoURL)
+	fmt.Printf("Report issue: %s/issues\n", cfg.Repo)
 }
 
 func includeLine(includes []string, line string) bool {
@@ -152,14 +152,14 @@ func excludeLine(excludes []string, line string) bool {
 
 func buildIssueComment(cfg *Config, outputs []string) string {
 	var s strings.Builder
-	s.WriteString(fmt.Sprintf("Run `%s` on Repo: %s got output\n", cfg.LinterCfg.LinterCommand, cfg.LinterCfg.RepoURL))
+	s.WriteString(fmt.Sprintf("Run `%s` on Repo: %s got output\n", cfg.LinterCfg.LinterCommand, cfg.Repo))
 	s.WriteString("```\n")
 	for _, o := range outputs {
 		s.WriteString(o)
 		s.WriteString("\n")
 	}
 	s.WriteString("```\n")
-	s.WriteString(fmt.Sprintf("Report issue: %s/issues\n", cfg.LinterCfg.RepoURL))
+	s.WriteString(fmt.Sprintf("Report issue: %s/issues\n", cfg.Repo))
 	s.WriteString(fmt.Sprintf("Github actions: %s", os.Getenv("GH_ACTION_LINK")))
 	return s.String()
 }

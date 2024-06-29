@@ -3,14 +3,13 @@ package runner
 import (
 	"context"
 	"log"
-	"os"
 	"time"
 
 	runner "github.com/alingse/go-linter-runner/runner/run"
 )
 
-func Run() {
-	var cfg, err = runner.LoadCfg(os.Args[1])
+func Run(repo string, jsonCfg string, yamlCfg string) {
+	var cfg, err = runner.LoadCfg(repo, jsonCfg, yamlCfg)
 	if err != nil {
 		log.Fatal("load config failed: ", err)
 		return

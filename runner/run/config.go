@@ -9,10 +9,13 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
 	LinterCfg  LinterCfg
+	Repo       string
 	RepoURL    *url.URL
 	RepoDir    string
 	RepoBranch string
@@ -22,21 +25,26 @@ type LinterCfg struct {
 	Workdir        string `json:"workdir"`
 	LinterCommand  string `json:"linter_command"`
 	InstallCommand string `json:"install_command"`
-	RepoURL        string `json:"repo_url"`
 	Includes       string `json:"includes"`
 	Excludes       string `json:"excludes"`
 	IssueID        string `json:"issue_id"`
 	Timeout        string `json:"timeout"`
 }
 
-func LoadCfg(arg string) (*Config, error) {
+func LoadCfg(repo, jsonCfg, yamlCfg string) (*Config, error) {
 	var linterCfg LinterCfg
-	err := json.Unmarshal([]byte(arg), &linterCfg)
+	var err error
+	if yamlCfg != "" {
+		err = yaml.Unmarshal([]byte(yamlCfg), &linterCfg)
+	} else {
+		err = json.Unmarshal([]byte(jsonCfg), &linterCfg)
+	}
 	if err != nil {
 		return nil, err
 	}
 	var cfg = &Config{
 		LinterCfg: linterCfg,
+		Repo:      repo,
 	}
 
 	// make workdir abs
@@ -51,8 +59,8 @@ func LoadCfg(arg string) (*Config, error) {
 		cfg.LinterCfg.Workdir = path.Join(cwd, cfg.LinterCfg.Workdir)
 	}
 
-	cfg.LinterCfg.RepoURL = strings.TrimSuffix(cfg.LinterCfg.RepoURL, "/")
-	cfg.RepoURL, err = url.Parse(cfg.LinterCfg.RepoURL)
+	cfg.Repo = strings.TrimSuffix(cfg.Repo, "/")
+	cfg.RepoURL, err = url.Parse(cfg.Repo)
 	if err != nil {
 		return nil, err
 	}
