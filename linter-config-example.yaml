@@ -2,6 +2,9 @@ workdir: '.'
 install_command: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
 linter_command: makezero
 repo_url: https://github.com/alingse/makezero
-includes: '["non-zero initialized length"]'
-excludes: '["assigned by index", "funcall"]'
+includes:
+  - non-zero initialized length
+excludes:
+  - assigned by index
+  - funcall
 issue_id: 1
