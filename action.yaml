@@ -6,7 +6,7 @@ inputs:
     description: |
       Go Version
       Default '1.22'
-    default: 1.22
+    default: '1.22'
   action:
     description: |
       'run' or 'submit'
@@ -48,7 +48,7 @@ inputs:
     description: |
       'submit' option: the repo url file for 'submit' action
       can be the file name in https://github.com/alingse/go-linter-runner/blob/main/source/ dir
-      or other file link.
+      or other file download link.
       Default 'top.txt'
     default: 'top.txt'
   submit_repo_count:
@@ -56,11 +56,11 @@ inputs:
       'submit' option: the repo url count to submit that read from `submit_source_file` for 'submit' action
       Default '1000'
     default: '1000'
-  submit_workflow_yaml_path:
+  submit_workflow_name:
     description: |
       'submit' option: the workflow to auto
-      Default '.github/workflows/run-repo.yml'
-    default: '.github/workflows/run-repo.yml'
+      Default 'run-repo.yml'
+    default: 'run-repo.yml'
 
 runs:
   using: "composite"

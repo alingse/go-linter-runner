@@ -2,7 +2,9 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -42,4 +44,13 @@ func SplitCommand(command string) (name string, args []string) {
 		return fields[0], nil
 	}
 	return fields[0], fields[1:]
+}
+
+func RunCmd(cmd *exec.Cmd) error {
+	data, err := cmd.CombinedOutput()
+	fmt.Println(string(data))
+	if err != nil {
+		return fmt.Errorf("run %s %+v failed %w", cmd.Path, cmd.Args, err)
+	}
+	return nil
 }
