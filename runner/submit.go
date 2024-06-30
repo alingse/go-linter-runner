@@ -12,7 +12,7 @@ const (
 	DefaultCount  int64  = 2000
 )
 
-func RunSubmit(sourceFile string, repoCount int64, workflowName string) {
+func RunSubmit(sourceFile string, repoCount int64, workflow string) {
 	repos, err := submit.ReadSubmitRepos(sourceFile, repoCount)
 	if err != nil {
 		log.Fatalf("read submit source file failed %s %+v", sourceFile, err)
@@ -24,7 +24,7 @@ func RunSubmit(sourceFile string, repoCount int64, workflowName string) {
 	}
 	// Submit
 	ctx := context.Background()
-	err = submit.SumitActions(ctx, workflowName, repos)
+	err = submit.SumitActions(ctx, workflow, repos)
 	if err != nil {
 		log.Fatalf("submit repos failed with %+v", err)
 		return
