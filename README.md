@@ -48,7 +48,7 @@ Refer to the [.github/workflows/go-linter-runner-submit.yml](https://github.com/
   uses: alingse/go-linter-runner@v1.0.0
   with:
     action: submit
-    submit_source_file: top.txt
+    submit_source_file: ${{ inputs.source }}
     submit_repo_count: ${{ inputs.count }}
     submit_workflow: ${{ inputs.workflow }}
   env:
