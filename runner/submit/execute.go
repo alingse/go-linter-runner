@@ -22,7 +22,8 @@ func getSourceReader(source string) (io.ReadCloser, error) {
 	}
 
 	if actionPath := os.Getenv("GITHUB_ACTION_PATH"); actionPath != "" {
-		filePath := path.Join(actionPath, source)
+		// /home/runner/work/_actions/alingse/go-linter-runner/main/source/top.txt
+		filePath := path.Join(actionPath, "source", source)
 		f, err := os.Open(filePath)
 		if err != nil {
 			return nil, err
