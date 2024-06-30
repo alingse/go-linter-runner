@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Example -> go-linter-runner submit 10 repos
-        uses: alingse/go-linter-runner@v1.0.0
+        uses: alingse/go-linter-runner@v1.0.1
         with:
           action: submit
           submit_source_file: ${{ inputs.source }}

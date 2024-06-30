@@ -17,7 +17,7 @@ Refer to the [.github/workflows/go-linter-runner.yml](https://github.com/alingse
 
 ```yaml
 - name: Example -> go-linter-runner run with yaml job config
-  uses: alingse/go-linter-runner@v1.0.0
+  uses: alingse/go-linter-runner@v1.0.1
   with:
     action: run
     yaml_config: .github/jobs/alingse-makezero.yaml
@@ -26,7 +26,7 @@ Refer to the [.github/workflows/go-linter-runner.yml](https://github.com/alingse
     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 - name: Example -> go-linter-runner use direct job config
-  uses: alingse/go-linter-runner@v1.0.0
+  uses: alingse/go-linter-runner@v1.0.1
   with:
     action: run
     install_command: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
@@ -44,8 +44,8 @@ Refer to the [.github/workflows/go-linter-runner.yml](https://github.com/alingse
 Refer to the [.github/workflows/go-linter-runner-submit.yml](https://github.com/alingse/go-linter-runner/blob/main/.github/workflows/go-linter-runner-submit.yml) configuration to set up the information needed to submit the tasks.
 
 ```yaml
-- name: Example -> go-linter-runner submit 10 repos
-  uses: alingse/go-linter-runner@v1.0.0
+- name: Submit go-linter-runner actions for repos
+  uses: alingse/go-linter-runner@v1.0.1
   with:
     action: submit
     submit_source_file: ${{ inputs.source }}
