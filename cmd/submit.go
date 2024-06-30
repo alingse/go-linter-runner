@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/alingse/go-linter-runner/runner"
 	"github.com/spf13/cobra"
@@ -24,6 +25,8 @@ var submitCmd = &cobra.Command{
 		if workflow == "" {
 			return fmt.Errorf("--workflow is required")
 		}
+		log.Printf("submit task with source:%s repo count: %d and workflow %s\n",
+			sourceFile, repoCount, workflow)
 		runner.RunSubmit(sourceFile, repoCount, workflow)
 		return nil
 	},
