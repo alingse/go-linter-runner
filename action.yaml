@@ -56,7 +56,7 @@ inputs:
       'submit' option: the repo url count to submit that read from `submit_source_file` for 'submit' action
       Default '1000'
     default: '1000'
-  submit_workflow_name:
+  submit_workflow:
     description: |
       'submit' option: the workflow to auto
       Default 'run-repo.yml'
@@ -76,23 +76,23 @@ runs:
         go build -o /usr/local/bin/go-linter-runner main.go
       shell: bash
 
-    - name: Execute run job with yaml config
+    - name: Check if and Execute run job with yaml config
       if: ${{ inputs.action == 'run' && inputs.yaml_config != '' }}
       run: go-linter-runner run --repo ${{ inputs.repo_url }} --yaml '${{ inputs.yaml_config }}'
       shell: bash
       env:
         GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-    - name: Execute run job with no-yaml config
+    - name: Check if and Execute run job with no-yaml config
       if: ${{ inputs.action == 'run' && inputs.yaml_config == '' }}
       run: go-linter-runner run --repo ${{ inputs.repo_url }} --json '${{ toJson(inputs) }}'
       shell: bash
       env:
         GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-    - name: Execute submit job
+    - name: Check if and Execute submit job
       if: ${{ inputs.action == 'submit' }}
-      run: go-linter-runner submit
+      run: go-linter-runner submit --source ${{ inputs.submit_source_file }} --count ${{ inputs.submit_repo_count }} --workflow ${{ inputs.submit_workflow }}
       shell: bash
       env:
         GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"

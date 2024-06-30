@@ -14,7 +14,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Trigger run-repo workflow
-        run: gh workflow run run-repo.yml --ref main
+      - name: Example -> go-linter-runner submit 10 repos
+        uses: alingse/go-linter-runner@main
+        with:
+          action: submit
+          submit_source_file: top.txt
+          submit_repo_count: 10
+          submit_workflow: run-repo.yml
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

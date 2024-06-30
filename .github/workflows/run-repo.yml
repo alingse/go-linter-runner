@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: example -> go-linter-runner run with yaml job config
+      - name: Example -> go-linter-runner run with yaml job config
         uses: alingse/go-linter-runner@main
         with:
           action: run
@@ -27,7 +27,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: example -> go-linter-runner use direct job config
+      - name: Example -> go-linter-runner use direct job config
         uses: alingse/go-linter-runner@main
         with:
           action: run
