@@ -1,79 +1,73 @@
 # go-linter-runner
 
-使用 GitHub Actions 为公开的 Go 仓库运行 Go linter 并以 issue comment 的形式报告
+Use GitHub Actions to run Go linters on public Go repositories and report the results as issue comments.
 
-# 背景
+## Background
+After implementing certain linters or linter idea, you may want to check if online repositories also have similar problem. For example, https://github.com/alingse/asasalint and https://github.com/ashanbrown/makezero#15 have discovered a large number of online bugs.
 
-在实现某些 linter 后,您可能希望检查在线仓库是否也存在类似的问题。例如,https://github.com/alingse/asasalint 和 https://github.com/ashanbrown/makezero#15 都发现了大量的在线 bug
-但是,手动观察 Actions 的结果并忽略一些特定的错误可能相当繁琐，因此可以使用此项目自动化
+However, manually observing the Actions results and ignoring certain specific errors can be quite tedious, so this project can be used to automate the process.
 
-# 使用
+# Usage
 
-推荐集成到 Github Workflow 中
+It is recommended to integrate this into your GitHub Workflow.
 
-## 配置检查单个 Repo 的 Workflow
+## Configure a workflow to run for a single Repository
 
-参考 [`.github/workflows/go-linter-runner.yml`](https://github.com/alingse/go-linter-runner/blob/main/.github/workflows/go-linter-runner.yml) 配置安装和运行 linter 的参数
-
-```yaml
-      - name: Example -> go-linter-runner run with yaml job config
-        uses: alingse/go-linter-runner@main
-        with:
-          action: run
-          yaml_config: .github/jobs/alingse-makezero.yaml
-          repo_url: ${{ inputs.repo_url }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Example -> go-linter-runner use direct job config
-        uses: alingse/go-linter-runner@main
-        with:
-          action: run
-          install_command: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
-          linter_command: makezero
-          includes: '["go", "github"]'
-          excludes: '["assigned by index", "funcall", "called by funcs"]'
-          issue_id: 1
-          repo_url: ${{ inputs.repo_url }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-```
-
-## 配置提交大量检查任务的 Workflow
-
-参考 [`.github/workflows/go-linter-runner-submit.yml`](https://github.com/alingse/go-linter-runner/blob/main/.github/workflows/go-linter-runner-submit.yml) 配置需要提交的信息
+Refer to the [.github/workflows/go-linter-runner.yml](https://github.com/alingse/go-linter-runner/blob/main/.github/workflows/go-linter-runner.yml) configuration to set up the parameters for installing and running the linter.
 
 ```yaml
-      - name: Example -> go-linter-runner submit 10 repos
-        uses: alingse/go-linter-runner@main
-        with:
-          action: submit
-          submit_source_file: top.txt
-          submit_repo_count: ${{ inputs.count }}
-          submit_workflow: ${{ inputs.workflow }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+- name: Example -> go-linter-runner run with yaml job config
+  uses: alingse/go-linter-runner@main
+  with:
+    action: run
+    yaml_config: .github/jobs/alingse-makezero.yaml
+    repo_url: ${{ inputs.repo_url }}
+  env:
+    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+- name: Example -> go-linter-runner use direct job config
+  uses: alingse/go-linter-runner@main
+  with:
+    action: run
+    install_command: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
+    linter_command: makezero
+    includes: '["go", "github"]'
+    excludes: '["assigned by index", "funcall", "called by funcs"]'
+    issue_id: 1
+    repo_url: ${{ inputs.repo_url }}
+  env:
+    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## 以本地二进制文件运行
+## Configure a workflow to submit multiple run tasks
+
+Refer to the [.github/workflows/go-linter-runner-submit.yml](https://github.com/alingse/go-linter-runner/blob/main/.github/workflows/go-linter-runner-submit.yml) configuration to set up the information needed to submit the tasks.
+
+```yaml
+- name: Example -> go-linter-runner submit 10 repos
+  uses: alingse/go-linter-runner@main
+  with:
+    action: submit
+    submit_source_file: top.txt
+    submit_repo_count: ${{ inputs.count }}
+    submit_workflow: ${{ inputs.workflow }}
+  env:
+    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+## Run locally with a binary
 
 ```bash
 go install github.com/alingse/go-linter-runner@latest
-```
-
-运行参考
-
-```bash
 go-linter-runner --help
 ```
 
-# 其他
+# Other
 
-## Github 效果
+## GitHub Effects
 
-参考 https://github.com/alingse/go-linter-runner/issues/1 的最新评论效果
+Refer to the latest comments in https://github.com/alingse/go-linter-runner/issues/1 for the effect.
 
-# 贡献
+# Contribution
 
-欢迎试用, 提交 Issue 和 Pull Request!
+Welcome to try, submit Issues and Pull Requests!
