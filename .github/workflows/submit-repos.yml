@@ -3,6 +3,17 @@ run-name: "submit repo urls for run-repo.yml"
 
 on:
   workflow_dispatch:
+    inputs:
+      count:
+        description: |
+          total submit repo count
+          Default '1000'
+        default: "1000"
+      workflow:
+        description: |
+          the workflow to submit with each repo
+          Default 'run-repo.yml'
+        default: "run-repo.yml"
 
 permissions:
   actions: write
@@ -19,7 +30,7 @@ jobs:
         with:
           action: submit
           submit_source_file: top.txt
-          submit_repo_count: 10
-          submit_workflow: run-repo.yml
+          submit_repo_count: ${{ inputs.count }}
+          submit_workflow: ${{ inputs.workflow }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
