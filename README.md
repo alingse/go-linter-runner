@@ -1,35 +1,79 @@
 # go-linter-runner
 
-A launcher to run a specific linter for a large number of Go repositories using Github Actions.
+使用 GitHub Actions 为公开的 Go 仓库运行 Go linter 并以 issue comment 的形式报告
 
-# Why
+# 背景
 
-After implementing certain linters, you may want to check if online repositories also have similar issues.
+在实现某些 linter 后,您可能希望检查在线仓库是否也存在类似的问题。例如,https://github.com/alingse/asasalint 和 https://github.com/ashanbrown/makezero#15 都发现了大量的在线 bug
+但是,手动观察 Actions 的结果并忽略一些特定的错误可能相当繁琐，因此可以使用此项目自动化
 
-For example, https://github.com/alingse/asasalint and https://github.com/ashanbrown/makezero/pull/15
+# 使用
 
-Both have detected numerous online bugs.
+推荐集成到 Github Workflow 中
 
-However, manually observing the results of Actions and ignoring some specific errors can be quite exhausting.
+## 配置检查单个 Repo 的 Workflow
 
-Here, you can configure additional `includes` and `excludes` to exclude false-positives that don't need to be addressed.
+参考 [`.github/workflows/go-linter-runner.yml`](https://github.com/alingse/go-linter-runner/blob/main/.github/workflows/go-linter-runner.yml) 配置安装和运行 linter 的参数
 
-# Effects
+```yaml
+      - name: Example -> go-linter-runner run with yaml job config
+        uses: alingse/go-linter-runner@main
+        with:
+          action: run
+          yaml_config: .github/jobs/alingse-makezero.yaml
+          repo_url: ${{ inputs.repo_url }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-see
-1. https://github.com/alingse/go-linter-runner/issues/1
-2. https://github.com/alingse/go-linter-runner/issues/2
+      - name: Example -> go-linter-runner use direct job config
+        uses: alingse/go-linter-runner@main
+        with:
+          action: run
+          install_command: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
+          linter_command: makezero
+          includes: '["go", "github"]'
+          excludes: '["assigned by index", "funcall", "called by funcs"]'
+          issue_id: 1
+          repo_url: ${{ inputs.repo_url }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+```
 
-# Dev
+## 配置提交大量检查任务的 Workflow
 
-## storage
+参考 [`.github/workflows/go-linter-runner-submit.yml`](https://github.com/alingse/go-linter-runner/blob/main/.github/workflows/go-linter-runner-submit.yml) 配置需要提交的信息
 
-we use https://getpantry.cloud/ as center storage when run a job
+```yaml
+      - name: Example -> go-linter-runner submit 10 repos
+        uses: alingse/go-linter-runner@main
+        with:
+          action: submit
+          submit_source_file: top.txt
+          submit_repo_count: ${{ inputs.count }}
+          submit_workflow: ${{ inputs.workflow }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
 
-# TODO
+## 以本地二进制文件运行
 
-- [] Ability to configure more linter yaml
-- [] Provide data aggregation (multiple failed Actions consolidated into a Sheet or a specific issue)
-- [] Automatic issue creation for projects(may use AI)
-- [] Automatic execution
+```bash
+go install github.com/alingse/go-linter-runner@latest
+```
+
+运行参考
+
+```bash
+go-linter-runner --help
+```
+
+# 其他
+
+## Github 效果
+
+参考 https://github.com/alingse/go-linter-runner/issues/1 的最新评论效果
+
+# 贡献
+
+欢迎试用, 提交 Issue 和 Pull Request!

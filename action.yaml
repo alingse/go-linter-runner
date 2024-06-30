@@ -19,7 +19,6 @@ inputs:
   repo_url:
     description: |
       The repo to run lint, only work for github repo now
-    required: true
   workdir:
     description: |
       'run' option: Work directory.
@@ -59,8 +58,8 @@ inputs:
   submit_workflow:
     description: |
       'submit' option: the workflow to auto
-      Default 'run-repo.yml'
-    default: 'run-repo.yml'
+      Default 'go-linter-runner.yml'
+    default: 'go-linter-runner.yml'
 
 runs:
   using: "composite"

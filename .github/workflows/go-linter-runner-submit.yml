@@ -1,5 +1,5 @@
 name: submit-repos
-run-name: "submit repo urls for run-repo.yml"
+run-name: "submit repo urls for go-linter-runner.yml"
 
 on:
   workflow_dispatch:
@@ -12,8 +12,8 @@ on:
       workflow:
         description: |
           the workflow to submit with each repo
-          Default 'run-repo.yml'
-        default: "run-repo.yml"
+          Default 'go-linter-runner.yml'
+        default: "go-linter-runner.yml"
 
 permissions:
   actions: write

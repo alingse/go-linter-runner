@@ -10,7 +10,7 @@ var rootCmd = &cobra.Command{
 	Use:   "go-linter-runner",
 	Short: "A cli to run linter for repos use github action",
 	Long: `A cli for run linter for github repo, and it post the result as issue comment,
-It can submit many run-repo.yml task by trigger many github workflow action`,
+It can submit many go-linter-runner.yml task by trigger many github workflow action`,
 }
 
 func Execute() {

@@ -7,4 +7,5 @@ includes:
 excludes:
   - assigned by index
   - funcall
+  - called by funcs
 issue_id: 1
