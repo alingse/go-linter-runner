@@ -35,7 +35,7 @@ var workflowPtr *string
 
 func init() {
 	rootCmd.AddCommand(submitCmd)
-	sourceFilePtr = runCmd.Flags().StringP("source", "s", runner.DefaultSource, "repo url file")
-	repoCountPtr = runCmd.Flags().Int64P("count", "c", runner.DefaultCount, "the repo count to submit")
-	workflowPtr = runCmd.Flags().StringP("workflow", "w", runner.DefaultSource, "workflow name to submit")
+	sourceFilePtr = submitCmd.Flags().StringP("source", "s", runner.DefaultSource, "repo url file")
+	repoCountPtr = submitCmd.Flags().Int64P("count", "c", runner.DefaultCount, "the repo count to submit")
+	workflowPtr = submitCmd.Flags().StringP("workflow", "w", "", "workflow name to submit")
 }

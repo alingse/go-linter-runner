@@ -29,7 +29,7 @@ func getSourceReader(source string) (io.ReadCloser, error) {
 		}
 		return f, nil
 	}
-	url := "https://github.com/alingse/go-linter-runner/blob/main/source/" + source
+	url := "https://raw.githubusercontent.com/alingse/go-linter-runner/main/source/" + source
 	return getHTTPReader(url)
 }
 
