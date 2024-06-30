@@ -54,6 +54,9 @@ func ReadSubmitRepos(source string, count int64) ([]string, error) {
 	repos := make([]string, 0, int(count))
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
+		if len(repos) >= int(count) {
+			return repos, nil
+		}
 		line := scanner.Text()
 		repo, err := url.Parse(line)
 		if err != nil {

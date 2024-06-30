@@ -27,7 +27,7 @@ var submitCmd = &cobra.Command{
 		}
 		log.Printf("submit task with source:%s repo count: %d and workflow %s\n",
 			sourceFile, repoCount, workflow)
-		runner.RunSubmit(sourceFile, repoCount, workflow)
+		runner.Submit(sourceFile, repoCount, workflow)
 		return nil
 	},
 }
