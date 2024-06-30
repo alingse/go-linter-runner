@@ -17,21 +17,31 @@ import (
 )
 
 func getSourceReader(source string) (io.ReadCloser, error) {
-	if strings.HasPrefix(source, "https://") {
+	if strings.HasPrefix(source, "https://") || strings.HasPrefix(source, "http://") {
 		return getHTTPReader(source)
+	}
+	if utils.IsFileExists(source) {
+		return getFileReader(source)
 	}
 
 	if actionPath := os.Getenv("GITHUB_ACTION_PATH"); actionPath != "" {
 		// /home/runner/work/_actions/alingse/go-linter-runner/main/source/top.txt
 		filePath := path.Join(actionPath, "source", source)
-		f, err := os.Open(filePath)
-		if err != nil {
-			return nil, err
+		if utils.IsFileExists(filePath) {
+			return getFileReader(filePath)
 		}
-		return f, nil
 	}
+
 	url := "https://raw.githubusercontent.com/alingse/go-linter-runner/main/source/" + source
 	return getHTTPReader(url)
+}
+
+func getFileReader(path string) (io.ReadCloser, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
 }
 
 func getHTTPReader(url string) (io.ReadCloser, error) {
