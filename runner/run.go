@@ -2,6 +2,7 @@ package runner
 
 import (
 	"context"
+	"errors"
 	"log"
 	"time"
 
@@ -22,6 +23,10 @@ func Run(repo string, jsonCfg string, yamlCfg string) {
 
 	err = runner.Prepare(ctx, cfg)
 	if err != nil {
+		if errors.Is(err, runner.ErrSkipNoGoModRepo) {
+			log.Println("failed in prepare linter:", err)
+			return
+		}
 		log.Fatal("failed in prepare linter:", err)
 		return
 	}
