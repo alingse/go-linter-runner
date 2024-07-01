@@ -64,6 +64,9 @@ go-linter-runner --help
 # submit task locally
 go-linter-runner submit -s ../go-linter-runner/source/top.txt -c 10000
 -w go-linter-runner.yml
+
+# or you can run workflow use gh client
+tail -1000 ../go-linter-runner/source/awesome.txt|xargs -I {} gh workflow run go-linter-runner.yml -F repo_url={}
 ```
 
 # Other
