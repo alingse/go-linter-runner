@@ -17,6 +17,7 @@ var ErrSkipNoGoModRepo = errors.New("skip this repo for no go.mod file exists")
 
 func runCmd(cmd *exec.Cmd) error {
 	data, err := cmd.CombinedOutput()
+	log.Printf("run cmd %+v got len(output)=%d and err %+v\n", cmd, len(data), err)
 	fmt.Println(string(data))
 	if err != nil {
 		return fmt.Errorf("run %s %+v failed %w", cmd.Path, cmd.Args, err)
