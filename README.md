@@ -60,6 +60,10 @@ Refer to the [.github/workflows/go-linter-runner-submit.yml](https://github.com/
 ```bash
 go install github.com/alingse/go-linter-runner@latest
 go-linter-runner --help
+
+# submit task locally
+go-linter-runner submit -s ../go-linter-runner/source/top.txt -c 10000
+-w go-linter-runner.yml
 ```
 
 # Other
