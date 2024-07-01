@@ -71,6 +71,15 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	return nil
 }
 
+func Build(ctx context.Context, cfg *Config) error {
+	cmd := exec.CommandContext(ctx, "go", "build", "./...")
+	cmd.Dir = cfg.RepoDir
+	if err := runCmd(cmd); err != nil {
+		return err
+	}
+	return nil
+}
+
 func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	name, args := utils.SplitCommand(cfg.LinterCfg.LinterCommand)
 	args = append(args, "./...")

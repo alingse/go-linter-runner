@@ -26,6 +26,12 @@ func Run(repo string, jsonCfg string, yamlCfg string) {
 		return
 	}
 
+	err = runner.Build(ctx, cfg)
+	if err != nil {
+		log.Printf("build failed and exit %+v %s", err, err.Error())
+		return
+	}
+
 	outputs, err := runner.Run(ctx, cfg)
 	if err != nil {
 		log.Fatal("failed in run linter:", err)
