@@ -1,6 +1,7 @@
 package run
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -86,10 +87,22 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	args = append(args, "./...")
 	cmd := exec.CommandContext(ctx, name, args...)
 	cmd.Dir = cfg.RepoDir
-	data, err := cmd.Output()
-	output := strings.TrimSpace(string(data))
-	if err != nil && len(output) == 0 {
-		return nil, err
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		log.Printf("run cmd %+v got err %+v \n", cmd, err)
+		fmt.Printf("stdout:\n%s\n", stdout.String())
+		fmt.Printf("stderr:\n%s\n", stderr.String())
+		if len(stdout.Bytes()) == 0 {
+			return nil, err
+		}
+	}
+	output := strings.TrimSpace(stdout.String())
+	if len(output) == 0 {
+		return nil, nil
 	}
 
 	// check includes && excludes
