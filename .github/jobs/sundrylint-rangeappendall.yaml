@@ -1,11 +1,8 @@
-name: sundrylint-rangeappendall
-linter: sundrylint
-workdir: .
-install: go install github.com/alingse/sundrylint/cmd/sundrylint@main
+workdir: '.'
+install_command: go install github.com/alingse/sundrylint/cmd/sundrylint@main
+linter_command: sundrylint
 includes:
-  - append all its data while range
+  - go
+  - github
 excludes: []
-issue:
-  id: 3
-  comment: true
-exit_fail: false
+issue_id: 3
