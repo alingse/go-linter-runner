@@ -6,11 +6,11 @@ import (
 	"log"
 	"time"
 
-	runner "github.com/alingse/go-linter-runner/runner/run"
+	"github.com/alingse/go-linter-runner/runner/run"
 )
 
 func Run(repo string, jsonCfg string, yamlCfg string) {
-	var cfg, err = runner.LoadCfg(repo, jsonCfg, yamlCfg)
+	var cfg, err = run.LoadCfg(repo, jsonCfg, yamlCfg)
 	if err != nil {
 		log.Fatal("load config failed: ", err)
 		return
@@ -21,9 +21,9 @@ func Run(repo string, jsonCfg string, yamlCfg string) {
 	ctx, cancel := context.WithTimeout(ctx, cfg.GetTimeout(defaultTimeout))
 	defer cancel()
 
-	err = runner.Prepare(ctx, cfg)
+	err = run.Prepare(ctx, cfg)
 	if err != nil {
-		if errors.Is(err, runner.ErrSkipNoGoModRepo) {
+		if errors.Is(err, run.ErrSkipNoGoModRepo) {
 			log.Println("failed in prepare linter:", err)
 			return
 		}
@@ -31,13 +31,13 @@ func Run(repo string, jsonCfg string, yamlCfg string) {
 		return
 	}
 
-	err = runner.Build(ctx, cfg)
+	err = run.Build(ctx, cfg)
 	if err != nil {
 		log.Printf("build failed and exit %+v %s", err, err.Error())
 		return
 	}
 
-	outputs, err := runner.Run(ctx, cfg)
+	outputs, err := run.Run(ctx, cfg)
 	if err != nil {
 		log.Fatal("failed in run linter:", err)
 		return
@@ -47,11 +47,11 @@ func Run(repo string, jsonCfg string, yamlCfg string) {
 		return
 	}
 
-	runner.Parse(ctx, cfg, outputs)
-	runner.PrintOutput(ctx, cfg, outputs)
+	run.Parse(ctx, cfg, outputs)
+	run.PrintOutput(ctx, cfg, outputs)
 	// create comment on issue
 	if cfg.LinterCfg.IssueID != "" {
-		err = runner.CreateIssueComment(ctx, cfg, outputs)
+		err = run.CreateIssueComment(ctx, cfg, outputs)
 		if err != nil {
 			log.Fatalf("failed to CreateIssueComment err %+v \n", err)
 			return

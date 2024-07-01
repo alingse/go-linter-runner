@@ -86,8 +86,8 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	args = append(args, "./...")
 	cmd := exec.CommandContext(ctx, name, args...)
 	cmd.Dir = cfg.RepoDir
-	data, err := cmd.CombinedOutput()
-	output := string(data)
+	data, err := cmd.Output()
+	output := strings.TrimSpace(string(data))
 	if err != nil && len(output) == 0 {
 		return nil, err
 	}
