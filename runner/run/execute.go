@@ -97,7 +97,9 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 		fmt.Printf("stdout:\n%s\n", stdout.String())
 		fmt.Printf("stderr:\n%s\n", stderr.String())
 		if len(stdout.Bytes()) == 0 {
-			return nil, err
+			// TODO: add a flag
+			// ignore the err
+			return nil, nil
 		}
 	}
 	output := strings.TrimSpace(stdout.String())
