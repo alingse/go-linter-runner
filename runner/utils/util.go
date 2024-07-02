@@ -38,6 +38,16 @@ func GetStringArray(s any) (ss []string) {
 	return
 }
 
+func CastToBool(v any) bool {
+	switch v := v.(type) {
+	case string:
+		return v == "true"
+	case bool:
+		return v
+	}
+	return false
+}
+
 func SplitCommand(command string) (name string, args []string) {
 	fields := strings.Fields(command)
 	if len(fields) == 1 {

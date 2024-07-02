@@ -98,7 +98,7 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 		fmt.Printf("stderr:\n%s\n", stderr.String())
 	}
 	output := stdout.String()
-	if cfg.LinterCfg.CollectStderr {
+	if utils.CastToBool(cfg.LinterCfg.CollectStderr) {
 		output = output + "\n" + stderr.String()
 	}
 
