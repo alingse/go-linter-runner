@@ -96,13 +96,13 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 		log.Printf("run cmd %+v got err %+v \n", cmd, err)
 		fmt.Printf("stdout:\n%s\n", stdout.String())
 		fmt.Printf("stderr:\n%s\n", stderr.String())
-		if len(stdout.Bytes()) == 0 {
-			// TODO: add a flag
-			// ignore the err
-			return nil, nil
-		}
 	}
-	output := strings.TrimSpace(stdout.String())
+	output := stdout.String()
+	if cfg.LinterCfg.CollectStderr {
+		output = output + "\n" + stderr.String()
+	}
+
+	output = strings.TrimSpace(output)
 	if len(output) == 0 {
 		return nil, nil
 	}

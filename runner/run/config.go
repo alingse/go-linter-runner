@@ -26,6 +26,7 @@ type LinterCfg struct {
 	Workdir        string `json:"workdir"         yaml:"workdir"`
 	LinterCommand  string `json:"linter_command"  yaml:"linter_command"`
 	InstallCommand string `json:"install_command" yaml:"install_command"`
+	CollectStderr  bool   `json:"collect_stderr"  yaml:"collect_stderr"`
 	Includes       any    `json:"includes"        yaml:"includes"`
 	Excludes       any    `json:"excludes"        yaml:"excludes"`
 	IssueID        string `json:"issue_id"        yaml:"issue_id"`

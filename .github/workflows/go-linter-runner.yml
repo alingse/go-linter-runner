@@ -1,11 +1,11 @@
-name: run-repo
-run-name: "run `makezero` for ${{github.event.inputs.repo_url}}"
+name: run go-linter-runner
+run-name: "run for ${{ inputs.repo_url }}"
 
 on:
   workflow_dispatch:
     inputs:
       repo_url:
-        description: "the repo to run linter"
+        description: "the repo to run"
         default: "https://github.com/alingse/makezero"
         required: true
 
@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Example -> go-linter-runner run with yaml job config
+      - name: Run go-linter-runner with yaml job config
         uses: alingse/go-linter-runner@v1.0.1
         with:
           action: run
@@ -27,12 +27,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Example -> go-linter-runner use direct job config
-        uses: alingse/go-linter-runner@v1.0.1
+      - name: Run go-linter-runner use action config
+        uses: alingse/go-linter-runner@main
         with:
           action: run
           install_command: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
           linter_command: makezero
+          collect_stderr: false
           includes: '["go", "github"]'
           excludes: '["assigned by index", "funcall", "called by funcs"]'
           issue_id: 1
