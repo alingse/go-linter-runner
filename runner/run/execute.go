@@ -92,8 +92,8 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	err := cmd.Run()
+	log.Printf("run cmd %+v got err %+v \n", cmd, err)
 	if err != nil {
-		log.Printf("run cmd %+v got err %+v \n", cmd, err)
 		fmt.Printf("stdout:\n%s\n", stdout.String())
 		fmt.Printf("stderr:\n%s\n", stderr.String())
 	}
