@@ -1004,7 +1004,6 @@ https://github.com/gptscript-ai/gptscript
 https://github.com/dominant-strategies/go-quai
 https://github.com/openshift/source-to-image
 https://github.com/minishift/minishift
-https://github.com/ChimeraCoder/gojson
 https://github.com/xanzy/go-gitlab
 https://github.com/aws/aws-sdk-go-v2
 https://github.com/apache/incubator-devlake

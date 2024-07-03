@@ -31,7 +31,6 @@ https://github.com/CalebQ42/bbConvert
 https://github.com/ChainSafe/gossamer
 https://github.com/Checkmarx/chainjacking
 https://github.com/ChimeraCoder/anaconda
-https://github.com/ChimeraCoder/gojson
 https://github.com/ChristopherRabotin/ode
 https://github.com/ChristopherRabotin/sg
 https://github.com/ClickHouse/clickhouse-go/
