@@ -104,7 +104,7 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	}
 
 	if cmd.ProcessState.ExitCode() != DiagnosticExitCode {
-		log.Printf("exit err %s\n", err.Error())
+		log.Printf("ignore exit err %s\n", err.Error())
 		return nil, nil
 	}
 
