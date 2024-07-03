@@ -30,12 +30,6 @@ inputs:
   linter_command:
     description: |
       'run' option: The lint command to run linter like 'xxlint --yy cc'
-  collect_stderr:
-    description: |
-      if true will use combined stderr/stdout as linter output
-      Default 'false'
-    default: false
-    type: boolean
   excludes:
     description: |
       'run' option: The output must exclude string array, can set as regex

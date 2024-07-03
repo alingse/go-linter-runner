@@ -16,6 +16,10 @@ import (
 
 var ErrSkipNoGoModRepo = errors.New("skip this repo for no go.mod file exists")
 
+const (
+	DiagnosticExitCode = 3
+)
+
 func runCmd(cmd *exec.Cmd) error {
 	data, err := cmd.CombinedOutput()
 	log.Printf("run cmd %+v got len(output)=%d and err %+v\n", cmd, len(data), err)
@@ -93,24 +97,24 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	log.Printf("run cmd %+v got err %+v \n", cmd, err)
-	if err != nil {
-		fmt.Printf("stdout:\n%s\n", stdout.String())
-		fmt.Printf("stderr:\n%s\n", stderr.String())
-	}
-	output := stdout.String()
-	if utils.CastToBool(cfg.LinterCfg.CollectStderr) {
-		output = output + "\n" + stderr.String()
-	}
-
-	output = strings.TrimSpace(output)
-	if len(output) == 0 {
+	fmt.Printf("stdout:\n%s\n", stdout.String())
+	fmt.Printf("stderr:\n%s\n", stderr.String())
+	if err == nil {
 		return nil, nil
 	}
 
+	if cmd.ProcessState.ExitCode() != DiagnosticExitCode {
+		log.Printf("exit err %s\n", err.Error())
+		return nil, nil
+	}
+
+	output := strings.TrimSpace(stderr.String())
+	if len(output) == 0 {
+		return nil, nil
+	}
 	// check includes && excludes
 	outputs := strings.Split(output, "\n")
 	validOutputs := make([]string, 0, len(outputs))
-
 	includes := utils.GetStringArray(cfg.LinterCfg.Includes)
 	excludes := utils.GetStringArray(cfg.LinterCfg.Excludes)
 	for _, line := range outputs {

@@ -33,7 +33,6 @@ jobs:
           action: run
           install_command: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
           linter_command: makezero
-          collect_stderr: false
           includes: '["go", "github"]'
           excludes: '["assigned by index", "funcall", "called by funcs"]'
           issue_id: 1
