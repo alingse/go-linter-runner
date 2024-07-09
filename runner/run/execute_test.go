@@ -16,7 +16,10 @@ func TestBuildIssueComment(t *testing.T) {
 			LinterCommand: "makezero",
 		},
 	}
-	body := buildIssueComment(cfg, outputs)
+	body, err := buildIssueComment(cfg, outputs)
+	if err != nil {
+		t.Errorf("Failed with error: %v", err)
+	}
 	t.Logf("build issue got %s \n", body)
 }
 
