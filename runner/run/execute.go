@@ -208,7 +208,11 @@ func buildIssueComment(cfg *Config, outputs []string) (string, error) {
 		data.Lines = append(data.Lines, text)
 	}
 	var tpl bytes.Buffer
-	tmpl := template.Must(template.New("issue_comment").Parse(issueCommentTemplate))
+	tmpl, err := template.New("issue_comment").Parse(issueCommentTemplate)
+
+  if err != nil {
+       return "", err
+  }
 	if err := tmpl.Execute(&tpl, data); err != nil {
 		return "", err
 	}
