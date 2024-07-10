@@ -3,8 +3,10 @@ package run
 import (
 	"bytes"
 	"context"
+	_ "embed"
 	"errors"
 	"fmt"
+	"text/template"
 	"log"
 	"os"
 	"os/exec"
@@ -184,22 +186,37 @@ func excludeLine(excludes []string, line string) bool {
 	return false
 }
 
-func buildIssueComment(cfg *Config, outputs []string) string {
-	var s strings.Builder
-	s.WriteString(fmt.Sprintf("Run `%s` on Repo: %s\n", cfg.LinterCfg.LinterCommand, cfg.Repo))
-	s.WriteString("\n")
-	s.WriteString(fmt.Sprintf("Got total %d line output in action: %s", len(outputs), os.Getenv("GH_ACTION_LINK")))
-	s.WriteString("\n")
-	s.WriteString("<details>\n")
-	s.WriteString("<summary>Expand</summary>\n\n")
-	for i, line := range outputs {
-		text := buildIssueCommentLine(cfg, line)
-		s.WriteString(fmt.Sprintf("%d. %s\n", i+1, text))
+//go:embed templates/issue_comment.md
+var issueCommentTemplate string
+
+type issueCommentData struct{
+	GithubActionLink string
+	Lines            []string
+	Linter           string
+	RepositoryURL    string
+}
+
+func buildIssueComment(cfg *Config, outputs []string) (string, error) {
+	var data = &issueCommentData{
+		GithubActionLink: os.Getenv("GH_ACTION_LINK"),
+		Linter: cfg.LinterCfg.LinterCommand,
+		RepositoryURL: cfg.Repo,
+		
 	}
-	s.WriteString("\n")
-	s.WriteString("</details>\n\n")
-	s.WriteString(fmt.Sprintf("Report issue: %s/issues\n", cfg.Repo))
-	return s.String()
+	for _, line := range outputs {
+		text := buildIssueCommentLine(cfg, line)
+		data.Lines = append(data.Lines, text)
+	}
+	var tpl bytes.Buffer
+	tmpl, err := template.New("issue_comment").Parse(issueCommentTemplate)
+
+  if err != nil {
+       return "", err
+  }
+	if err := tmpl.Execute(&tpl, data); err != nil {
+		return "", err
+	}
+	return tpl.String(), nil
 }
 
 func buildIssueCommentLine(cfg *Config, line string) string {
@@ -229,7 +246,10 @@ func buildIssueCommentLineSplit(cfg *Config, line string) (codePath string, othe
 }
 
 func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) error {
-	body := buildIssueComment(cfg, outputs)
+	body, err := buildIssueComment(cfg, outputs)
+	if err != nil {
+		return err
+	}
 	cmd := exec.CommandContext(ctx, "gh", "issue", "comment",
 		cfg.LinterCfg.IssueID,
 		"--body", body)
