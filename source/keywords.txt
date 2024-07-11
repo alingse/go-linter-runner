@@ -227,3 +227,8 @@ help
 pool
 keyword
 add
+platform
+filesystem
+notification
+file
+noti
