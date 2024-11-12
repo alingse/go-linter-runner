@@ -235,6 +235,20 @@ func buildIssueCommentLine(cfg *Config, line string) string {
 }
 
 func buildIssueCommentLineSplit(cfg *Config, line string) (codePath string, other string) {
+	// sytyle 1: normal linter
+	if strings.Contains(line, cfg.RepoTarget) {
+		return buildIssueCommentLineSplitStyle1(cfg, line)
+	}
+	// style 2: revive
+	if strings.Contains(line, " ") {
+		return buildIssueCommentLineSplitStyle2(cfg, line)
+	}
+	return "", line
+}
+
+func buildIssueCommentLineSplitStyle1(cfg *Config, line string) (codePath string, other string) {
+	// style 1
+	// /home/runner/work/go-linter-runner-example/go-linter-runner-example/rangeappendall/rangeappendslice.go:8:9: append all its data while range its
 	index := strings.Index(line, cfg.RepoTarget)
 	if index < 0 {
 		return "", line
@@ -249,6 +263,32 @@ func buildIssueCommentLineSplit(cfg *Config, line string) (codePath string, othe
 	codePath = tail[:index]
 	other += tail[index:]
 	return strings.TrimSpace(codePath), strings.TrimSpace(other)
+}
+
+func buildIssueCommentLineSplitStyle2(cfg *Config, line string) (codePath string, other string) {
+	// style 2: badcodes/revive/revive_modify_value.go#L17:2: suspicious assignment to a by-value method receiver (false positive?)
+	parts := strings.Split(line, " ")
+	others := make([]string, 0)
+	for _, part := range parts {
+		if len(part) == 0 {
+			continue
+		}
+
+		if strings.Contains(part, ".go#L") {
+			if strings.HasPrefix(part, "/") {
+				codePath = cfg.RepoTarget + part
+			} else {
+				codePath = cfg.RepoTarget + "/" + part
+			}
+		} else {
+			others = append(others, part)
+		}
+	}
+
+	if len(codePath) == 0 {
+		return "", line
+	}
+	return codePath, strings.Join(others, " ")
 }
 
 func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) error {
