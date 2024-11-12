@@ -1,7 +1,0 @@
-workdir: '.'
-install_command: go install github.com/mgechev/revive@92c320954a0c1cf775826e2b9c98aa9ca5fac3ca
-linter_command: revive
-includes:
-  - false positive
-excludes:
-issue_id: 8

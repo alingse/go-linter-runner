@@ -448,7 +448,6 @@ https://github.com/chenmingyong0423/go-mongox
 https://github.com/chenquan/go-pkg
 https://github.com/cheshir/go-mq
 https://github.com/cheshir/ttlcache
-https://github.com/cheynewallace/tabby
 https://github.com/chmike/securecookie
 https://github.com/chmike/varint
 https://github.com/chonthu/go-google-analytics
@@ -955,7 +954,6 @@ https://github.com/google/google-api-go-client
 https://github.com/google/gopacket
 https://github.com/google/hilbert
 https://github.com/google/ko
-https://github.com/google/leveldb
 https://github.com/google/starlark-go
 https://github.com/google/uuid
 https://github.com/google/wire

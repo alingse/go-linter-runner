@@ -6,12 +6,12 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
-	"text/template"
 	"log"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
+	"text/template"
 
 	"github.com/alingse/go-linter-runner/runner/utils"
 )
@@ -98,7 +98,7 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	err := cmd.Run()
-	log.Printf("run cmd %+v got err %+v \n", cmd, err)
+	log.Printf("run cmd %+v got err %+v and exit code %+v \n", cmd, err, cmd.ProcessState.ExitCode())
 	fmt.Printf("stdout:\n%s\n", stdout.String())
 	fmt.Printf("stderr:\n%s\n", stderr.String())
 	if err == nil {
@@ -189,7 +189,7 @@ func excludeLine(excludes []string, line string) bool {
 //go:embed templates/issue_comment.md
 var issueCommentTemplate string
 
-type issueCommentData struct{
+type issueCommentData struct {
 	GithubActionLink string
 	Lines            []string
 	Linter           string
@@ -199,9 +199,8 @@ type issueCommentData struct{
 func buildIssueComment(cfg *Config, outputs []string) (string, error) {
 	var data = &issueCommentData{
 		GithubActionLink: os.Getenv("GH_ACTION_LINK"),
-		Linter: cfg.LinterCfg.LinterCommand,
-		RepositoryURL: cfg.Repo,
-		
+		Linter:           cfg.LinterCfg.LinterCommand,
+		RepositoryURL:    cfg.Repo,
 	}
 	for _, line := range outputs {
 		text := buildIssueCommentLine(cfg, line)
@@ -210,9 +209,9 @@ func buildIssueComment(cfg *Config, outputs []string) (string, error) {
 	var tpl bytes.Buffer
 	tmpl, err := template.New("issue_comment").Parse(issueCommentTemplate)
 
-  if err != nil {
-       return "", err
-  }
+	if err != nil {
+		return "", err
+	}
 	if err := tmpl.Execute(&tpl, data); err != nil {
 		return "", err
 	}
