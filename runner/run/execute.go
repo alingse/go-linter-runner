@@ -113,9 +113,14 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 
 	output := strings.TrimSpace(stderr.String())
 	if len(output) == 0 {
-		log.Printf("stderr output is empty")
-		return nil, nil
+		log.Printf("stderr output is empty, fallback to stdout")
+		output = stdout.String()
+		if len(output) == 0 {
+			log.Printf("stdout output is still empty")
+			return nil, nil
+		}
 	}
+
 	// check includes && excludes
 	outputs := strings.Split(output, "\n")
 	validOutputs := make([]string, 0, len(outputs))
