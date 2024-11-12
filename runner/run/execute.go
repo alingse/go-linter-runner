@@ -209,6 +209,7 @@ func buildIssueComment(cfg *Config, outputs []string) (string, error) {
 		Linter:           cfg.LinterCfg.LinterCommand,
 		RepositoryURL:    cfg.Repo,
 	}
+
 	for _, line := range outputs {
 		text := buildIssueCommentLine(cfg, line)
 		data.Lines = append(data.Lines, text)
@@ -231,7 +232,25 @@ func buildIssueCommentLine(cfg *Config, line string) string {
 		return line
 	}
 	pathText := strings.TrimLeft(strings.ReplaceAll(codePath, cfg.RepoTarget, ""), "/:")
+	codePath = cleanCodePath(codePath)
+	pathText = cleanPathText(pathText)
 	return fmt.Sprintf(`<a href="%s">%s</a> %s`, codePath, pathText, other)
+}
+
+func cleanCodePath(codePath string) string {
+	parts := strings.Split(codePath, ":")
+	if len(parts) <= 2 {
+		return codePath
+	}
+	return strings.Join(parts[:2], ":")
+}
+
+func cleanPathText(pathText string) string {
+	parts := strings.Split(pathText, ":")
+	if len(parts) <= 1 {
+		return pathText
+	}
+	return parts[0]
 }
 
 func buildIssueCommentLineSplit(cfg *Config, line string) (codePath string, other string) {
