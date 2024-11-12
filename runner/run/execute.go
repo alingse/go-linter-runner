@@ -231,7 +231,7 @@ func buildIssueCommentLine(cfg *Config, line string) string {
 		return line
 	}
 	pathText := strings.TrimLeft(strings.ReplaceAll(codePath, cfg.RepoTarget, ""), "/:")
-	return fmt.Sprintf("[%s](%s) %s", pathText, codePath, other)
+	return fmt.Sprintf(`<a href="%s">%s</a> %s`, codePath, pathText, other)
 }
 
 func buildIssueCommentLineSplit(cfg *Config, line string) (codePath string, other string) {
