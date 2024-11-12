@@ -102,6 +102,7 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	fmt.Printf("stdout:\n%s\n", stdout.String())
 	fmt.Printf("stderr:\n%s\n", stderr.String())
 	if err == nil {
+		log.Printf("err is nil and return")
 		return nil, nil
 	}
 
@@ -112,6 +113,7 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 
 	output := strings.TrimSpace(stderr.String())
 	if len(output) == 0 {
+		log.Printf("stderr output is empty")
 		return nil, nil
 	}
 	// check includes && excludes
