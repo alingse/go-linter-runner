@@ -30,6 +30,7 @@ type LinterCfg struct {
 	Excludes       any    `json:"excludes"        yaml:"excludes"`
 	IssueID        string `json:"issue_id"        yaml:"issue_id"`
 	Timeout        string `json:"timeout"         yaml:"timeout"`
+	EnableTestFile bool   `json:"enable_testfile" yaml:"enable_testfile"`
 }
 
 func LoadCfg(repo, jsonCfg, yamlCfg string) (*Config, error) {

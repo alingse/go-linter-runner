@@ -42,7 +42,16 @@ func Run(repo string, jsonCfg string, yamlCfg string) {
 		return
 	}
 
-	run.Parse(ctx, cfg, outputs)
+	// clean
+	outputs = run.Parse(ctx, cfg, outputs)
+	// filter
+	outputs = run.FilterOutput(ctx, cfg, outputs)
+
+	if len(outputs) == 0 {
+		log.Println("no valid output after parse and filter")
+		return
+	}
+
 	run.PrintOutput(ctx, cfg, outputs)
 	// create comment on issue
 	if cfg.LinterCfg.IssueID != "" {

@@ -155,6 +155,21 @@ func Parse(ctx context.Context, cfg *Config, outputs []string) []string {
 	return outputs
 }
 
+const testFile = "_test.go"
+
+func FilterOutput(ctx context.Context, cfg *Config, outputs []string) []string {
+	result := make([]string, 0, len(outputs))
+	for _, o := range outputs {
+		// filter _test.go file
+		if !cfg.LinterCfg.EnableTestFile && strings.Contains(o, testFile) {
+			log.Println("ignore testfile output ", o)
+			continue
+		}
+		result = append(result, o)
+	}
+	return result
+}
+
 var divider = strings.Repeat(`=`, 100)
 
 func PrintOutput(ctx context.Context, cfg *Config, outputs []string) {
