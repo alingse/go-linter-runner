@@ -30,21 +30,24 @@ type LinterCfg struct {
 	Excludes       any    `json:"excludes"        yaml:"excludes"`
 	IssueID        string `json:"issue_id"        yaml:"issue_id"`
 	Timeout        string `json:"timeout"         yaml:"timeout"`
-	EnableTestFile bool   `json:"enable_testfile" yaml:"enable_testfile"`
+	EnableTestfile bool   `json:"enable_testfile" yaml:"enable_testfile"`
 }
 
 func LoadCfg(repo, jsonCfg, yamlCfg string) (*Config, error) {
 	var linterCfg LinterCfg
+
 	var err error
 	if yamlCfg != "" {
 		err = yaml.Unmarshal([]byte(yamlCfg), &linterCfg)
 	} else {
 		err = json.Unmarshal([]byte(jsonCfg), &linterCfg)
 	}
+
 	if err != nil {
 		return nil, err
 	}
-	var cfg = &Config{
+
+	cfg := &Config{
 		LinterCfg: linterCfg,
 		Repo:      repo,
 	}
@@ -53,15 +56,18 @@ func LoadCfg(repo, jsonCfg, yamlCfg string) (*Config, error) {
 	if cfg.LinterCfg.Workdir == "" {
 		cfg.LinterCfg.Workdir = "."
 	}
+
 	if !path.IsAbs(cfg.LinterCfg.Workdir) {
 		cwd, err := os.Getwd()
 		if err != nil {
 			return nil, err
 		}
+
 		cfg.LinterCfg.Workdir = path.Join(cwd, cfg.LinterCfg.Workdir)
 	}
 
 	cfg.Repo = strings.TrimSuffix(cfg.Repo, "/")
+
 	cfg.RepoURL, err = url.Parse(cfg.Repo)
 	if err != nil {
 		return nil, err
@@ -74,9 +80,11 @@ func LoadCfg(repo, jsonCfg, yamlCfg string) (*Config, error) {
 	if cfg.LinterCfg.InstallCommand == "" {
 		return nil, fmt.Errorf("install_command is empty %+v", cfg)
 	}
+
 	if cfg.LinterCfg.LinterCommand == "" {
 		return nil, fmt.Errorf("linter_command is empty %+v", cfg)
 	}
+
 	return cfg, nil
 }
 
@@ -87,5 +95,6 @@ func (c *Config) GetTimeout(defaultDuration time.Duration) time.Duration {
 			return time.Duration(timeout) * time.Second
 		}
 	}
+
 	return defaultDuration
 }

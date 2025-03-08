@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"errors"
 	"log"
 
 	"github.com/alingse/go-linter-runner/runner"
@@ -15,26 +15,29 @@ var submitCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		sourceFile := *sourceFilePtr
 		if sourceFile == "" {
-			return fmt.Errorf("--source is required")
+			return errors.New("--source is required")
 		}
 		repoCount := *repoCountPtr
 		if repoCount <= 0 {
-			return fmt.Errorf("--count muest greater than zero")
+			return errors.New("--count muest greater than zero")
 		}
 		workflow := *workflowPtr
 		if workflow == "" {
-			return fmt.Errorf("--workflow is required")
+			return errors.New("--workflow is required")
 		}
 		log.Printf("submit task with source:%s repo count: %d and workflow %s\n",
 			sourceFile, repoCount, workflow)
 		runner.Submit(sourceFile, repoCount, workflow)
+
 		return nil
 	},
 }
 
-var sourceFilePtr *string
-var repoCountPtr *int64
-var workflowPtr *string
+var (
+	sourceFilePtr *string
+	repoCountPtr  *int64
+	workflowPtr   *string
+)
 
 func init() {
 	rootCmd.AddCommand(submitCmd)

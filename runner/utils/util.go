@@ -13,9 +13,11 @@ func IsFileExists(filename string) bool {
 	if os.IsNotExist(err) {
 		return false
 	}
+
 	if err != nil {
 		return false
 	}
+
 	return true
 }
 
@@ -25,6 +27,7 @@ func GetStringArray(s any) (ss []string) {
 		if value == "" || value == "[]" {
 			return
 		}
+
 		_ = json.Unmarshal([]byte(value), &ss)
 	case []string:
 		return
@@ -32,9 +35,11 @@ func GetStringArray(s any) (ss []string) {
 		if len(value) == 0 {
 			return
 		}
+
 		data, _ := json.Marshal(value)
 		_ = json.Unmarshal(data, &ss)
 	}
+
 	return
 }
 
@@ -45,6 +50,7 @@ func CastToBool(v any) bool {
 	case bool:
 		return v
 	}
+
 	return false
 }
 
@@ -53,14 +59,17 @@ func SplitCommand(command string) (name string, args []string) {
 	if len(fields) == 1 {
 		return fields[0], nil
 	}
+
 	return fields[0], fields[1:]
 }
 
 func RunCmd(cmd *exec.Cmd) error {
 	data, err := cmd.CombinedOutput()
 	fmt.Println(string(data))
+
 	if err != nil {
 		return fmt.Errorf("run %s %+v failed %w", cmd.Path, cmd.Args, err)
 	}
+
 	return nil
 }
