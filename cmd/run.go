@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"errors"
 	"os"
 
 	"github.com/alingse/go-linter-runner/runner"
@@ -17,21 +17,24 @@ var runCmd = &cobra.Command{
 		yamlConfig := string(yamlData)
 		jsonConfig := *jsonConfigPtr
 		if yamlConfig == "" && jsonConfig == "" {
-			return fmt.Errorf("one of the options -y and -j must be set.")
+			return errors.New("one of the options -y and -j must be set.")
 		}
 
 		repo := *repoURLPtr
 		if repo == "" {
-			return fmt.Errorf("the -r/--repo muest be set.")
+			return errors.New("the -r/--repo muest be set.")
 		}
 		runner.Run(repo, jsonConfig, yamlConfig)
+
 		return nil
 	},
 }
 
-var jsonConfigPtr *string
-var yamlConfigPtr *string
-var repoURLPtr *string
+var (
+	jsonConfigPtr *string
+	yamlConfigPtr *string
+	repoURLPtr    *string
+)
 
 func init() {
 	rootCmd.AddCommand(runCmd)

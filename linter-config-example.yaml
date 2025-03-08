@@ -1,11 +1,7 @@
 workdir: '.'
-install_command: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
-linter_command: makezero
-repo_url: https://github.com/alingse/makezero
-includes:
-  - non-zero initialized length
-excludes:
-  - assigned by index
-  - funcall
-  - called by funcs
-issue_id: 1
+install_command: go install github.com/alingse/sundrylint/cmd/sundrylint@latest
+linter_command: sundrylint
+includes: ["some case"]
+excludes: ["some unexpected case"]
+issue_id: 2
+enable_testfile: false

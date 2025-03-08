@@ -42,7 +42,10 @@ inputs:
     description: |
       'run' option: If linter catch some output, it will post comment on the issue
     default: ''
-
+  enable_testfile:
+    description: |
+      'run' option: If enable_testfile is true, it will report the case in _test.go
+    default: false
   submit_source_file:
     description: |
       'submit' option: the repo url file for 'submit' action

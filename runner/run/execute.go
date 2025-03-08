@@ -26,9 +26,11 @@ func runCmd(cmd *exec.Cmd) error {
 	data, err := cmd.CombinedOutput()
 	log.Printf("run cmd %+v got len(output)=%d and err %+v\n", cmd, len(data), err)
 	fmt.Println(string(data))
+
 	if err != nil {
 		return fmt.Errorf("run %s %+v failed %w", cmd.Path, cmd.Args, err)
 	}
+
 	return nil
 }
 
@@ -37,6 +39,7 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	name, args := utils.SplitCommand(cfg.LinterCfg.InstallCommand)
 	cmd := exec.CommandContext(ctx, name, args...)
 	cmd.Dir = cfg.LinterCfg.Workdir
+
 	if err := runCmd(cmd); err != nil {
 		return err
 	}
@@ -44,11 +47,14 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	// clone repo
 	cmd = exec.CommandContext(ctx, "rm", "-rf", cfg.RepoDir)
 	cmd.Dir = cfg.LinterCfg.Workdir
+
 	if err := runCmd(cmd); err != nil {
 		return err
 	}
+
 	cmd = exec.CommandContext(ctx, "git", "clone", cfg.Repo)
 	cmd.Dir = cfg.LinterCfg.Workdir
+
 	if err := runCmd(cmd); err != nil {
 		return err
 	}
@@ -63,6 +69,7 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	// run go mod download
 	cmd = exec.CommandContext(ctx, "go", "mod", "download")
 	cmd.Dir = cfg.RepoDir
+
 	if err := runCmd(cmd); err != nil {
 		return err
 	}
@@ -70,21 +77,26 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	// read default branch for repo
 	cmd = exec.CommandContext(ctx, "git", "branch", "--show-current")
 	cmd.Dir = cfg.RepoDir
+
 	output, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("git branch failed %w", err)
 	}
+
 	cfg.RepoBranch = strings.TrimSpace(string(output))
 	cfg.RepoTarget = cfg.Repo + "/blob/" + cfg.RepoBranch
+
 	return nil
 }
 
 func Build(ctx context.Context, cfg *Config) error {
 	cmd := exec.CommandContext(ctx, "go", "build", "./...")
 	cmd.Dir = cfg.RepoDir
+
 	if err := runCmd(cmd); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -93,30 +105,38 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	args = append(args, "./...")
 	cmd := exec.CommandContext(ctx, name, args...)
 	cmd.Dir = cfg.RepoDir
+
 	var stdout bytes.Buffer
+
 	var stderr bytes.Buffer
+
 	cmd.Stdout = &stdout
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	log.Printf("run cmd %+v got err %+v and exit code %+v \n", cmd, err, cmd.ProcessState.ExitCode())
 	fmt.Printf("stdout:\n%s\n", stdout.String())
 	fmt.Printf("stderr:\n%s\n", stderr.String())
+
 	if err == nil {
 		log.Printf("err is nil and return")
+
 		return nil, nil
 	}
 
 	if cmd.ProcessState.ExitCode() != DiagnosticExitCode {
 		log.Printf("ignore exit err %s\n", err.Error())
+
 		return nil, nil
 	}
 
 	output := strings.TrimSpace(stderr.String())
 	if len(output) == 0 {
 		log.Printf("stderr output is empty, fallback to stdout")
+
 		output = stdout.String()
 		if len(output) == 0 {
 			log.Printf("stdout output is still empty")
+
 			return nil, nil
 		}
 	}
@@ -126,15 +146,18 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	validOutputs := make([]string, 0, len(outputs))
 	includes := utils.GetStringArray(cfg.LinterCfg.Includes)
 	excludes := utils.GetStringArray(cfg.LinterCfg.Excludes)
+
 	for _, line := range outputs {
 		line := strings.TrimSpace(line)
 		if len(line) == 0 {
 			continue
 		}
+
 		if includeLine(includes, line) && !excludeLine(excludes, line) {
 			validOutputs = append(validOutputs, line)
 		}
 	}
+
 	return validOutputs, nil
 }
 
@@ -152,7 +175,27 @@ func Parse(ctx context.Context, cfg *Config, outputs []string) []string {
 			outputs[i] = strings.ReplaceAll(line, ".go:", ".go#L")
 		}
 	}
+
 	return outputs
+}
+
+const testFile = "_test.go"
+
+func FilterOutput(ctx context.Context, cfg *Config, outputs []string) []string {
+	result := make([]string, 0, len(outputs))
+
+	for _, line := range outputs {
+		// filter _test.go file
+		if !cfg.LinterCfg.EnableTestfile && strings.Contains(line, testFile) {
+			log.Println("ignore testfile output ", line)
+
+			continue
+		}
+
+		result = append(result, line)
+	}
+
+	return result
 }
 
 var divider = strings.Repeat(`=`, 100)
@@ -162,9 +205,11 @@ func PrintOutput(ctx context.Context, cfg *Config, outputs []string) {
 	fmt.Println(divider)
 	fmt.Printf("runner config: %+v\n", cfg)
 	fmt.Println(divider)
+
 	for _, line := range outputs {
 		fmt.Println(line)
 	}
+
 	fmt.Println(divider)
 	fmt.Printf("Report issue: %s/issues\n", cfg.Repo)
 }
@@ -173,11 +218,13 @@ func includeLine(includes []string, line string) bool {
 	if len(includes) == 0 {
 		return true
 	}
+
 	for _, v := range includes {
 		if strings.Contains(line, v) {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -185,11 +232,13 @@ func excludeLine(excludes []string, line string) bool {
 	if len(excludes) == 0 {
 		return false
 	}
+
 	for _, v := range excludes {
 		if strings.Contains(line, v) {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -204,7 +253,7 @@ type issueCommentData struct {
 }
 
 func buildIssueComment(cfg *Config, outputs []string) (string, error) {
-	var data = &issueCommentData{
+	data := &issueCommentData{
 		GithubActionLink: os.Getenv("GH_ACTION_LINK"),
 		Linter:           cfg.LinterCfg.LinterCommand,
 		RepositoryURL:    cfg.Repo,
@@ -214,15 +263,18 @@ func buildIssueComment(cfg *Config, outputs []string) (string, error) {
 		text := buildIssueCommentLine(cfg, line)
 		data.Lines = append(data.Lines, text)
 	}
-	var tpl bytes.Buffer
-	tmpl, err := template.New("issue_comment").Parse(issueCommentTemplate)
 
+	var tpl bytes.Buffer
+
+	tmpl, err := template.New("issue_comment").Parse(issueCommentTemplate)
 	if err != nil {
 		return "", err
 	}
+
 	if err := tmpl.Execute(&tpl, data); err != nil {
 		return "", err
 	}
+
 	return tpl.String(), nil
 }
 
@@ -231,9 +283,11 @@ func buildIssueCommentLine(cfg *Config, line string) string {
 	if codePath == "" {
 		return line
 	}
+
 	pathText := strings.TrimLeft(strings.ReplaceAll(codePath, cfg.RepoTarget, ""), "/:")
 	codePath = cleanCodePath(codePath)
 	pathText = cleanPathText(pathText)
+
 	return fmt.Sprintf(`<a href="%s">%s</a> %s`, codePath, pathText, other)
 }
 
@@ -242,6 +296,7 @@ func cleanCodePath(codePath string) string {
 	if len(parts) <= 2 {
 		return codePath
 	}
+
 	return strings.Join(parts[:2], ":")
 }
 
@@ -250,6 +305,7 @@ func cleanPathText(pathText string) string {
 	if len(parts) <= 1 {
 		return pathText
 	}
+
 	return parts[0]
 }
 
@@ -262,6 +318,7 @@ func buildIssueCommentLineSplit(cfg *Config, line string) (codePath string, othe
 	if strings.Contains(line, " ") {
 		return buildIssueCommentLineSplitStyle2(cfg, line)
 	}
+
 	return "", line
 }
 
@@ -272,15 +329,20 @@ func buildIssueCommentLineSplitStyle1(cfg *Config, line string) (codePath string
 	if index < 0 {
 		return "", line
 	}
+
 	other = line[:index]
 	tail := line[index:]
 	index = strings.Index(tail, " ")
+
 	if index < 0 {
 		codePath = tail
+
 		return strings.TrimSpace(codePath), strings.TrimSpace(other)
 	}
+
 	codePath = tail[:index]
 	other += tail[index:]
+
 	return strings.TrimSpace(codePath), strings.TrimSpace(other)
 }
 
@@ -288,6 +350,7 @@ func buildIssueCommentLineSplitStyle2(cfg *Config, line string) (codePath string
 	// style 2: badcodes/revive/revive_modify_value.go#L17:2: suspicious assignment to a by-value method receiver (false positive?)
 	parts := strings.Split(line, " ")
 	others := make([]string, 0)
+
 	for _, part := range parts {
 		if len(part) == 0 {
 			continue
@@ -307,6 +370,7 @@ func buildIssueCommentLineSplitStyle2(cfg *Config, line string) (codePath string
 	if len(codePath) == 0 {
 		return "", line
 	}
+
 	return codePath, strings.Join(others, " ")
 }
 
@@ -315,10 +379,13 @@ func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) erro
 	if err != nil {
 		return err
 	}
+
 	cmd := exec.CommandContext(ctx, "gh", "issue", "comment",
 		cfg.LinterCfg.IssueID,
 		"--body", body)
 	cmd.Dir = "."
+
 	log.Printf("comment on issue #%s\n", cfg.LinterCfg.IssueID)
+
 	return runCmd(cmd)
 }
