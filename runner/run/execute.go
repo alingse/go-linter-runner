@@ -184,9 +184,10 @@ const testFile = "_test.go"
 func FilterOutput(ctx context.Context, cfg *Config, outputs []string) []string {
 	result := make([]string, 0, len(outputs))
 
+	enableTestfile := utils.CastToBool(cfg.LinterCfg.EnableTestfile)
 	for _, line := range outputs {
 		// filter _test.go file
-		if !cfg.LinterCfg.EnableTestfile && strings.Contains(line, testFile) {
+		if !enableTestfile && strings.Contains(line, testFile) {
 			log.Println("ignore testfile output ", line)
 
 			continue
