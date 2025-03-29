@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"errors"
-	"log"
+	"log/slog"
 
 	"github.com/alingse/go-linter-runner/runner"
 	"github.com/spf13/cobra"
@@ -25,18 +25,23 @@ var submitCmd = &cobra.Command{
 		if workflow == "" {
 			return errors.New("--workflow is required")
 		}
-		log.Printf("submit task with source:%s repo count: %d and workflow %s\n",
-			sourceFile, repoCount, workflow)
-		runner.Submit(sourceFile, repoCount, workflow)
-
+		workflowRef := *workflowRefPtr
+		slog.LogAttrs(cmd.Context(), slog.LevelInfo, "submit task with",
+			slog.String("source", sourceFile),
+			slog.Int64("repoCount", repoCount),
+			slog.String("workflow", workflow),
+			slog.String("workflowRef", workflowRef),
+		)
+		runner.Submit(sourceFile, repoCount, workflow, workflowRef)
 		return nil
 	},
 }
 
 var (
-	sourceFilePtr *string
-	repoCountPtr  *int64
-	workflowPtr   *string
+	sourceFilePtr  *string
+	repoCountPtr   *int64
+	workflowPtr    *string
+	workflowRefPtr *string
 )
 
 func init() {
@@ -44,4 +49,5 @@ func init() {
 	sourceFilePtr = submitCmd.Flags().StringP("source", "s", runner.DefaultSource, "repo url file")
 	repoCountPtr = submitCmd.Flags().Int64P("count", "c", runner.DefaultCount, "the repo count to submit")
 	workflowPtr = submitCmd.Flags().StringP("workflow", "w", "", "workflow name to submit")
+	workflowRefPtr = submitCmd.Flags().StringP("ref", "r", "", " The branch or tag name which contains the version of the workflow file you'd like to run")
 }
