@@ -60,9 +60,14 @@ inputs:
     default: '1000'
   submit_workflow:
     description: |
-      'submit' option: the workflow to auto
+      'submit' option: the workflow to run
       Default 'go-linter-runner.yml'
     default: 'go-linter-runner.yml'
+  submit_workflow_ref:
+    description: |
+      'submit' option: the workflow ref barnch to run
+      Default ''
+    default: ''
 
 runs:
   using: "composite"
@@ -94,7 +99,7 @@ runs:
 
     - name: Check if and Execute submit job
       if: ${{ inputs.action == 'submit' }}
-      run: go-linter-runner submit --source ${{ inputs.submit_source_file }} --count ${{ inputs.submit_repo_count }} --workflow ${{ inputs.submit_workflow }}
+      run: go-linter-runner submit --source ${{ inputs.submit_source_file }} --count ${{ inputs.submit_repo_count }} --workflow ${{ inputs.submit_workflow }} --ref ${{ inputs.submit_workflow_ref }}
       shell: bash
       env:
         GH_ACTION_LINK: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"

@@ -88,11 +88,11 @@ func ReadSubmitRepos(source string, count int64) ([]string, error) {
 	return repos, nil
 }
 
-func SumitActions(ctx context.Context, workflow string, repos []string) error {
+func SumitActions(ctx context.Context, workflow string, workflowRef string, repos []string) error {
 	for i, repo := range repos {
 		log.Printf("submit repo %d : %s \n", i, repo)
 
-		err := submitRepo(ctx, workflow, repo)
+		err := submitRepo(ctx, workflow, workflowRef, repo)
 		if err != nil {
 			return err
 		}
@@ -101,10 +101,18 @@ func SumitActions(ctx context.Context, workflow string, repos []string) error {
 	return nil
 }
 
-func submitRepo(ctx context.Context, workflow string, repo string) error {
-	cmd := exec.CommandContext(ctx, "gh", "workflow", "run", workflow,
-		"-F", "repo_url="+repo)
-	cmd.Dir = "."
+func submitRepo(ctx context.Context, workflow string, workflowRef string, repo string) error {
+	args := []string{
+		"workflow",
+		"run",
+		workflow,
+	}
+	if workflowRef != "" {
+		args = append(args, "-r", workflowRef)
+	}
+	args = append(args, "-F", "repo_url="+repo)
 
+	cmd := exec.CommandContext(ctx, "gh", args...)
+	cmd.Dir = "."
 	return utils.RunCmd(cmd)
 }
