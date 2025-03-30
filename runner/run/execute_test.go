@@ -120,19 +120,25 @@ badcodes/revive/revive_modify_value.go:22:2: suspicious assignment to a by-value
 		t.Errorf("err should be nil but got %+v", err)
 	}
 
-	expected := `Run ` + "``" + ` on Repo: https://github.com/alingse/go-linter-runner-example
+	var expected = `Run ` + "``" + ` on Repo: https://github.com/alingse/go-linter-runner-example
+
+
+<div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin: 16px 0;">
+  <h3 style="margin-top: 0;">go-linter-runner-example</h3>
+  <div>⚠️ Failed to get repository details</div>
+</div>
+
 
 Got total 2 lines output in action: https://github.com/xxx
 
-<details>
-<summary>Expand</summary>
+<details open>
+<summary>Click to expand details</summary>
 <ol>
 <li><a href="https://github.com/alingse/go-linter-runner-example/blob/main/badcodes/revive/revive_modify_value.go#L17">badcodes/revive/revive_modify_value.go#L17</a> suspicious assignment to a by-value method receiver (false positive?)</li>
 <li><a href="https://github.com/alingse/go-linter-runner-example/blob/main/badcodes/revive/revive_modify_value.go#L22">badcodes/revive/revive_modify_value.go#L22</a> suspicious assignment to a by-value method receiver (false positive?)</li></ol>
 </details>
 
-Report issue: https://github.com/alingse/go-linter-runner-example/issues
-`
+Report issue: https://github.com/alingse/go-linter-runner-example/issues`
 
 	if body != expected {
 		t.Errorf("body %s is not expect %s", body, expected)
