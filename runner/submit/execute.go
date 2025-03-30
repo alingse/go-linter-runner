@@ -13,6 +13,7 @@ import (
 	"path"
 	"strings"
 
+	"golang.org/x/time/rate"
 	"github.com/alingse/go-linter-runner/runner/utils"
 )
 
@@ -93,8 +94,14 @@ func ReadSubmitRepos(ctx context.Context, cfg *SubmitConfig) ([]string, error) {
 }
 
 func SumitActions(ctx context.Context, cfg *SubmitConfig, repos []string) error {
+	limiter := rate.NewLimiter(rate.Limit(cfg.RateLimit), 1)
+
 	for i, repo := range repos {
 		log.Printf("submit repo %d : %s \n", i, repo)
+
+		if err := limiter.Wait(ctx); err != nil {
+			return err
+		}
 
 		err := submitRepo(ctx, cfg, repo)
 		if err != nil {

@@ -7,8 +7,9 @@ import (
 )
 
 const (
-	DefaultSource string = `top.txt`
-	DefaultCount  int64  = 2000
+	DefaultSource string  = `top.txt`
+	DefaultCount  int64   = 2000
+	DefaultRate   float64 = 0.25
 )
 
 func Submit(ctx context.Context, cfg *submit.SubmitConfig) error {

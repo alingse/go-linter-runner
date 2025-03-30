@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"errors"
 	"log"
 	"log/slog"
@@ -34,9 +33,10 @@ var submitCmd = &cobra.Command{
 			RepoCount:   int(repoCount),
 			Workflow:    workflow,
 			WorkflowRef: workflowRef,
+			RateLimit:   *rateLimitPtr,
 		}
-		slog.LogAttrs(cmd.Context(), slog.LevelInfo, "submit task with", slog.Any("config", cfg))
-		ctx := context.Background()
+		ctx := cmd.Context()
+		slog.LogAttrs(ctx, slog.LevelInfo, "submit task with", slog.Any("config", cfg))
 		if err := runner.Submit(ctx, cfg); err != nil {
 			log.Fatal(err)
 		}
@@ -49,6 +49,7 @@ var (
 	repoCountPtr   *int64
 	workflowPtr    *string
 	workflowRefPtr *string
+	rateLimitPtr   *float64
 )
 
 func init() {
@@ -57,4 +58,5 @@ func init() {
 	repoCountPtr = submitCmd.Flags().Int64P("count", "c", runner.DefaultCount, "the repo count to submit")
 	workflowPtr = submitCmd.Flags().StringP("workflow", "w", "", "workflow name to submit")
 	workflowRefPtr = submitCmd.Flags().StringP("ref", "r", "", " The branch or tag name which contains the version of the workflow file you'd like to run")
+	rateLimitPtr = submitCmd.Flags().Float64P("rate", "", runner.DefaultRate, "submit workflow qps")
 }
