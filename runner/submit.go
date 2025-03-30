@@ -2,7 +2,6 @@ package runner
 
 import (
 	"context"
-	"log"
 
 	"github.com/alingse/go-linter-runner/runner/submit"
 )
@@ -12,26 +11,10 @@ const (
 	DefaultCount  int64  = 2000
 )
 
-func Submit(sourceFile string, repoCount int64, workflow string, workflowRef string) {
-	repos, err := submit.ReadSubmitRepos(sourceFile, repoCount)
+func Submit(ctx context.Context, cfg *submit.SubmitConfig) error {
+	repos, err := submit.ReadSubmitRepos(ctx, cfg)
 	if err != nil {
-		log.Fatalf("read submit source file failed %s %+v", sourceFile, err)
-
-		return
+		return err
 	}
-
-	if len(repos) == 0 {
-		log.Fatalf("read submit source file got empty %s", sourceFile)
-
-		return
-	}
-	// Submit
-	ctx := context.Background()
-
-	err = submit.SumitActions(ctx, workflow, workflowRef, repos)
-	if err != nil {
-		log.Fatalf("submit repos failed with %+v", err)
-
-		return
-	}
+	return submit.SumitActions(ctx, cfg, repos)
 }

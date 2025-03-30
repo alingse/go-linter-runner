@@ -16,26 +16,26 @@ import (
 	"github.com/alingse/go-linter-runner/runner/utils"
 )
 
-func getSourceReader(source string) (io.ReadCloser, error) {
-	if strings.HasPrefix(source, "https://") || strings.HasPrefix(source, "http://") {
-		return getHTTPReader(source)
+func getSourceReader(ctx context.Context, cfg *SubmitConfig) (io.ReadCloser, error) {
+	if strings.HasPrefix(cfg.Source, "https://") || strings.HasPrefix(cfg.Source, "http://") {
+		return getHTTPReader(ctx, cfg.Source)
 	}
 
-	if utils.IsFileExists(source) {
-		return getFileReader(source)
+	if utils.IsFileExists(cfg.Source) {
+		return getFileReader(cfg.Source)
 	}
 
 	if actionPath := os.Getenv("GITHUB_ACTION_PATH"); actionPath != "" {
 		// /home/runner/work/_actions/alingse/go-linter-runner/main/source/top.txt
-		filePath := path.Join(actionPath, "source", source)
+		filePath := path.Join(actionPath, "source", cfg.Source)
 		if utils.IsFileExists(filePath) {
 			return getFileReader(filePath)
 		}
 	}
 
-	url := "https://raw.githubusercontent.com/alingse/go-linter-runner/main/source/" + source
+	url := "https://raw.githubusercontent.com/alingse/go-linter-runner/main/source/" + cfg.Source
 
-	return getHTTPReader(url)
+	return getHTTPReader(ctx, url)
 }
 
 func getFileReader(path string) (io.ReadCloser, error) {
@@ -47,8 +47,12 @@ func getFileReader(path string) (io.ReadCloser, error) {
 	return f, nil
 }
 
-func getHTTPReader(url string) (io.ReadCloser, error) {
-	resp, err := http.Get(url)
+func getHTTPReader(ctx context.Context, url string) (io.ReadCloser, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -60,18 +64,18 @@ func getHTTPReader(url string) (io.ReadCloser, error) {
 	return resp.Body, nil
 }
 
-func ReadSubmitRepos(source string, count int64) ([]string, error) {
-	reader, err := getSourceReader(source)
+func ReadSubmitRepos(ctx context.Context, cfg *SubmitConfig) ([]string, error) {
+	reader, err := getSourceReader(ctx, cfg)
 	if err != nil {
 		return nil, err
 	}
 	defer reader.Close()
 
-	repos := make([]string, 0, int(count))
+	repos := make([]string, 0, cfg.RepoCount)
 	scanner := bufio.NewScanner(reader)
 
 	for scanner.Scan() {
-		if len(repos) >= int(count) {
+		if len(repos) >= cfg.RepoCount {
 			return repos, nil
 		}
 
@@ -88,11 +92,11 @@ func ReadSubmitRepos(source string, count int64) ([]string, error) {
 	return repos, nil
 }
 
-func SumitActions(ctx context.Context, workflow string, workflowRef string, repos []string) error {
+func SumitActions(ctx context.Context, cfg *SubmitConfig, repos []string) error {
 	for i, repo := range repos {
 		log.Printf("submit repo %d : %s \n", i, repo)
 
-		err := submitRepo(ctx, workflow, workflowRef, repo)
+		err := submitRepo(ctx, cfg, repo)
 		if err != nil {
 			return err
 		}
@@ -101,14 +105,14 @@ func SumitActions(ctx context.Context, workflow string, workflowRef string, repo
 	return nil
 }
 
-func submitRepo(ctx context.Context, workflow string, workflowRef string, repo string) error {
+func submitRepo(ctx context.Context, cfg *SubmitConfig, repo string) error {
 	args := []string{
 		"workflow",
 		"run",
-		workflow,
+		cfg.Workflow,
 	}
-	if workflowRef != "" {
-		args = append(args, "-r", workflowRef)
+	if cfg.WorkflowRef != "" {
+		args = append(args, "-r", cfg.WorkflowRef)
 	}
 	args = append(args, "-F", "repo_url="+repo)
 

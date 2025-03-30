@@ -1,10 +1,13 @@
 package cmd
 
 import (
+	"context"
 	"errors"
+	"log"
 	"log/slog"
 
 	"github.com/alingse/go-linter-runner/runner"
+	"github.com/alingse/go-linter-runner/runner/submit"
 	"github.com/spf13/cobra"
 )
 
@@ -26,13 +29,17 @@ var submitCmd = &cobra.Command{
 			return errors.New("--workflow is required")
 		}
 		workflowRef := *workflowRefPtr
-		slog.LogAttrs(cmd.Context(), slog.LevelInfo, "submit task with",
-			slog.String("source", sourceFile),
-			slog.Int64("repoCount", repoCount),
-			slog.String("workflow", workflow),
-			slog.String("workflowRef", workflowRef),
-		)
-		runner.Submit(sourceFile, repoCount, workflow, workflowRef)
+		cfg := &submit.SubmitConfig{
+			Source:      sourceFile,
+			RepoCount:   int(repoCount),
+			Workflow:    workflow,
+			WorkflowRef: workflowRef,
+		}
+		slog.LogAttrs(cmd.Context(), slog.LevelInfo, "submit task with", slog.Any("config", cfg))
+		ctx := context.Background()
+		if err := runner.Submit(ctx, cfg); err != nil {
+			log.Fatal(err)
+		}
 		return nil
 	},
 }
