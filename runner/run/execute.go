@@ -34,36 +34,51 @@ func runCmd(cmd *exec.Cmd) error {
 	return nil
 }
 
-func Prepare(ctx context.Context, cfg *Config) error {
+func Prepare(ctx context.Context, cfg *Config) (*RepoInfo, error) {
+	var err error
 	// install linter
 	name, args := utils.SplitCommand(cfg.LinterCfg.InstallCommand)
 	cmd := exec.CommandContext(ctx, name, args...)
 	cmd.Dir = cfg.LinterCfg.Workdir
 
 	if err := runCmd(cmd); err != nil {
-		return err
+		return nil, err
 	}
 
+	// fetch repo info
+	var repoInfo *RepoInfo
+	if cfg.IsGithub && len(cfg.RepoID) > 0 {
+		repoInfo, err = FetchRepoInfo(cfg.RepoID)
+		if err != nil {
+			// ignore fetch failed
+			log.Printf("fetch github repo info failed %s %+v \n", cfg.RepoID, err)
+		}
+	}
+
+	// skip for archived
+	//if repoInfo.IsArchived {
+	//	return nil
+	//}
 	// clone repo
 	cmd = exec.CommandContext(ctx, "rm", "-rf", cfg.RepoDir)
 	cmd.Dir = cfg.LinterCfg.Workdir
 
 	if err := runCmd(cmd); err != nil {
-		return err
+		return nil, err
 	}
 
 	cmd = exec.CommandContext(ctx, "git", "clone", cfg.Repo)
 	cmd.Dir = cfg.LinterCfg.Workdir
 
 	if err := runCmd(cmd); err != nil {
-		return err
+		return nil, err
 	}
 
 	// TODO: check more deep
 	// check go.mod exists
 	gomodFile := path.Join(cfg.RepoDir, "go.mod")
 	if !utils.IsFileExists(gomodFile) {
-		return ErrSkipNoGoModRepo
+		return nil, ErrSkipNoGoModRepo
 	}
 
 	// run go mod download
@@ -71,7 +86,7 @@ func Prepare(ctx context.Context, cfg *Config) error {
 	cmd.Dir = cfg.RepoDir
 
 	if err := runCmd(cmd); err != nil {
-		return err
+		return nil, err
 	}
 
 	// read default branch for repo
@@ -80,13 +95,13 @@ func Prepare(ctx context.Context, cfg *Config) error {
 
 	output, err := cmd.Output()
 	if err != nil {
-		return fmt.Errorf("git branch failed %w", err)
+		return nil, fmt.Errorf("git branch failed %w", err)
 	}
 
 	cfg.RepoBranch = strings.TrimSpace(string(output))
 	cfg.RepoTarget = cfg.Repo + "/blob/" + cfg.RepoBranch
 
-	return nil
+	return repoInfo, nil
 }
 
 func Build(ctx context.Context, cfg *Config) error {
@@ -251,13 +266,15 @@ type issueCommentData struct {
 	Lines            []string
 	Linter           string
 	RepositoryURL    string
+	RepoInfo         *RepoInfo
 }
 
-func buildIssueComment(cfg *Config, outputs []string) (string, error) {
+func buildIssueComment(cfg *Config, repoInfo *RepoInfo, outputs []string) (string, error) {
 	data := &issueCommentData{
 		GithubActionLink: os.Getenv("GH_ACTION_LINK"),
 		Linter:           cfg.LinterCfg.LinterCommand,
 		RepositoryURL:    cfg.Repo,
+		RepoInfo:         repoInfo,
 	}
 
 	for _, line := range outputs {
@@ -375,8 +392,8 @@ func buildIssueCommentLineSplitStyle2(cfg *Config, line string) (codePath string
 	return codePath, strings.Join(others, " ")
 }
 
-func CreateIssueComment(ctx context.Context, cfg *Config, outputs []string) error {
-	body, err := buildIssueComment(cfg, outputs)
+func CreateIssueComment(ctx context.Context, cfg *Config, repoInfo *RepoInfo, outputs []string) error {
+	body, err := buildIssueComment(cfg, repoInfo, outputs)
 	if err != nil {
 		return err
 	}

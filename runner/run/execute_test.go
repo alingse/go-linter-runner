@@ -21,7 +21,7 @@ func TestBuildIssueComment(t *testing.T) {
 		},
 	}
 
-	body, err := buildIssueComment(cfg, outputs)
+	body, err := buildIssueComment(cfg, nil, outputs)
 	if err != nil {
 		t.Errorf("Failed with error: %v", err)
 	}
@@ -115,7 +115,7 @@ badcodes/revive/revive_modify_value.go:22:2: suspicious assignment to a by-value
 
 	outputs = Parse(ctx, cfg, outputs)
 
-	body, err := buildIssueComment(cfg, outputs)
+	body, err := buildIssueComment(cfg, nil, outputs)
 	if err != nil {
 		t.Errorf("err should be nil but got %+v", err)
 	}

@@ -13,8 +13,8 @@ import (
 	"path"
 	"strings"
 
-	"golang.org/x/time/rate"
 	"github.com/alingse/go-linter-runner/runner/utils"
+	"golang.org/x/time/rate"
 )
 
 func getSourceReader(ctx context.Context, cfg *SubmitConfig) (io.ReadCloser, error) {

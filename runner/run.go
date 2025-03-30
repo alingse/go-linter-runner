@@ -23,7 +23,7 @@ func Run(repo string, jsonCfg string, yamlCfg string) {
 	ctx, cancel := context.WithTimeout(ctx, cfg.GetTimeout(defaultTimeout))
 	defer cancel()
 
-	err = run.Prepare(ctx, cfg)
+	repoInfo, err := run.Prepare(ctx, cfg)
 	if err != nil {
 		log.Fatal("failed in prepare linter:", err)
 
@@ -64,7 +64,7 @@ func Run(repo string, jsonCfg string, yamlCfg string) {
 	run.PrintOutput(ctx, cfg, outputs)
 	// create comment on issue
 	if cfg.LinterCfg.IssueID != "" {
-		err = run.CreateIssueComment(ctx, cfg, outputs)
+		err = run.CreateIssueComment(ctx, cfg, repoInfo, outputs)
 		if err != nil {
 			log.Fatalf("failed to CreateIssueComment err %+v \n", err)
 
