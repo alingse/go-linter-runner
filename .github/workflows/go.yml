@@ -26,5 +26,3 @@ jobs:
 
     - name: Test
       run: go test -v ./...
-      env:
-        GH_TOKEN: ${{ github.token }}
