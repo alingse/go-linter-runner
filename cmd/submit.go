@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/alingse/go-linter-runner/runner"
+	"github.com/alingse/go-linter-runner/runner/submit"
 	"github.com/spf13/cobra"
 )
 
@@ -26,14 +27,16 @@ var submitCmd = &cobra.Command{
 			return errors.New("--workflow is required")
 		}
 		workflowRef := *workflowRefPtr
-		slog.LogAttrs(cmd.Context(), slog.LevelInfo, "submit task with",
-			slog.String("source", sourceFile),
-			slog.Int64("repoCount", repoCount),
-			slog.String("workflow", workflow),
-			slog.String("workflowRef", workflowRef),
-		)
-		runner.Submit(sourceFile, repoCount, workflow, workflowRef)
-		return nil
+		cfg := &submit.SubmitConfig{
+			Source:      sourceFile,
+			RepoCount:   int(repoCount),
+			Workflow:    workflow,
+			WorkflowRef: workflowRef,
+			RateLimit:   *rateLimitPtr,
+		}
+		ctx := cmd.Context()
+		slog.LogAttrs(ctx, slog.LevelInfo, "submit task with", slog.Any("config", cfg))
+		return runner.Submit(ctx, cfg)
 	},
 }
 
@@ -42,6 +45,7 @@ var (
 	repoCountPtr   *int64
 	workflowPtr    *string
 	workflowRefPtr *string
+	rateLimitPtr   *float64
 )
 
 func init() {
@@ -50,4 +54,5 @@ func init() {
 	repoCountPtr = submitCmd.Flags().Int64P("count", "c", runner.DefaultCount, "the repo count to submit")
 	workflowPtr = submitCmd.Flags().StringP("workflow", "w", "", "workflow name to submit")
 	workflowRefPtr = submitCmd.Flags().StringP("ref", "r", "", " The branch or tag name which contains the version of the workflow file you'd like to run")
+	rateLimitPtr = submitCmd.Flags().Float64P("rate", "", runner.DefaultRate, "submit workflow qps")
 }

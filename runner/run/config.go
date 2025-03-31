@@ -16,6 +16,8 @@ import (
 type Config struct {
 	LinterCfg  LinterCfg
 	Repo       string
+	IsGithub   bool
+	RepoID     string
 	RepoURL    *url.URL
 	RepoDir    string
 	RepoBranch string
@@ -32,6 +34,10 @@ type LinterCfg struct {
 	Timeout        string `json:"timeout"         yaml:"timeout"`
 	EnableTestfile any    `json:"enable_testfile" yaml:"enable_testfile"`
 }
+
+const (
+	GithubPrefix = `https://github.com/`
+)
 
 func LoadCfg(repo, jsonCfg, yamlCfg string) (*Config, error) {
 	var linterCfg LinterCfg
@@ -67,6 +73,10 @@ func LoadCfg(repo, jsonCfg, yamlCfg string) (*Config, error) {
 	}
 
 	cfg.Repo = strings.TrimSuffix(cfg.Repo, "/")
+	if strings.HasPrefix(cfg.Repo, GithubPrefix) {
+		cfg.IsGithub = true
+		cfg.RepoID = strings.TrimPrefix(cfg.Repo, GithubPrefix)
+	}
 
 	cfg.RepoURL, err = url.Parse(cfg.Repo)
 	if err != nil {
