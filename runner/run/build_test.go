@@ -138,14 +138,8 @@ func TestBuildIssueCommentWithRepoInfo(t *testing.T) {
 
 			// Check repo info display
 			if tt.repoInfo != nil {
-				if tt.repoInfo.IsArchived && !strings.Contains(got, "This repository is archived") {
+				if tt.repoInfo.IsArchived && !strings.Contains(got, "Archived") {
 					t.Error("archived repo should show warning")
-				}
-				if tt.repoInfo.IsFork && !strings.Contains(got, "This is a fork repository") {
-					t.Error("fork repo should show indicator")
-				}
-				if tt.repoInfo.IsEmpty && !strings.Contains(got, "This is an empty repository") {
-					t.Error("empty repo should show indicator")
 				}
 				if tt.repoInfo.StargazerCount >= 1000 && !strings.Contains(got, "k") {
 					t.Error("large star count should be formatted")
@@ -238,6 +232,49 @@ func TestIsOldDate(t *testing.T) {
 	}
 }
 
+func TestYearsSince(t *testing.T) {
+	now := time.Now()
+	tests := []struct {
+		name string
+		arg  string
+		want int
+	}{
+		{
+			name: "empty date",
+			arg:  "",
+			want: 0,
+		},
+		{
+			name: "current date",
+			arg:  now.Format(time.RFC3339),
+			want: 0,
+		},
+		{
+			name: "1 year ago",
+			arg:  now.AddDate(-1, 0, 0).Format(time.RFC3339),
+			want: 1,
+		},
+		{
+			name: "2 years ago",
+			arg:  now.AddDate(-2, 0, 0).Format(time.RFC3339),
+			want: 2,
+		},
+		{
+			name: "invalid date",
+			arg:  "invalid-date",
+			want: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := yearsSince(tt.arg); got != tt.want {
+				t.Errorf("yearsSince() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestFormatDate(t *testing.T) {
 	now := time.Now()
 	tests := []struct {
@@ -296,4 +333,63 @@ func TestRepoName(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestFullInfo(t *testing.T) {
+	outputs := []string{
+		"example output line 1",
+		"example output line 2",
+	}
+
+	baseCfg := &Config{
+		RepoTarget: "https://github.com/example/repo/blob/main",
+		Repo:       "https://github.com/example/repo",
+		LinterCfg: LinterCfg{
+			LinterCommand: "example-linter",
+		},
+	}
+
+	repoInfo := &RepoInfo{
+		StargazerCount: 5792,
+		ForkCount:      369,
+		PushedAt:       "2024-12-07T14:51:24Z",
+		UpdatedAt:      "2025-03-30T01:26:21Z",
+		IsFork:         false,
+		IsEmpty:        false,
+		IsArchived:     false,
+	}
+
+	t.Setenv("GH_ACTION_LINK", "https://github.com/example/action")
+
+	body, err := buildIssueComment(baseCfg, repoInfo, outputs)
+	if err != nil {
+		t.Fatalf("buildIssueComment() error = %v", err)
+	}
+
+	// Check basic info
+	if !strings.Contains(body, baseCfg.LinterCfg.LinterCommand) {
+		t.Error("output should contain linter command")
+	}
+	if !strings.Contains(body, baseCfg.Repo) {
+		t.Error("output should contain repo URL")
+	}
+
+	// Check repo info display
+	if !strings.Contains(body, "5.8k") {
+		t.Error("should show formatted star count")
+	}
+	if !strings.Contains(body, "369") {
+		t.Error("should show fork count")
+	}
+	if !strings.Contains(body, "2024-12-07 14:51:24") {
+		t.Error("should show pushed at date")
+	}
+
+	// Check output lines
+	for _, line := range outputs {
+		if !strings.Contains(body, line) {
+			t.Errorf("output should contain line: %s", line)
+		}
+	}
+	t.Logf("build body\n---\n%s\n---", body)
 }

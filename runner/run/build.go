@@ -29,6 +29,7 @@ var templateFuncs = template.FuncMap{
 	"isOldDate":   isOldDate,
 	"formatDate":  formatDate,
 	"repoName":    repoName,
+	"yearsSince":  yearsSince,
 }
 
 func buildIssueComment(cfg *Config, repoInfo *RepoInfo, outputs []string) (string, error) {
@@ -84,6 +85,17 @@ func formatDate(dateStr string) string {
 		return dateStr
 	}
 	return t.Format(time.DateTime)
+}
+
+func yearsSince(dateStr string) int {
+	if dateStr == "" {
+		return 0
+	}
+	t, err := time.Parse(time.RFC3339, dateStr)
+	if err != nil {
+		return 0
+	}
+	return int(time.Since(t).Hours() / 24 / 365)
 }
 
 func repoName(url string) string {

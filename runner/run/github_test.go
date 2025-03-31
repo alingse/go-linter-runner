@@ -20,6 +20,7 @@ func TestFetchRepoInfo(t *testing.T) {
 	// 检查返回结果不为 nil
 	if info == nil {
 		t.Error("RepoInfo should not be nil")
+		return
 	}
 
 	// 检查基本字段是否有值

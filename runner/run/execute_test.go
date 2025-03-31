@@ -122,12 +122,13 @@ badcodes/revive/revive_modify_value.go:22:2: suspicious assignment to a by-value
 
 	var expected = `Run ` + "``" + ` on Repo: https://github.com/alingse/go-linter-runner-example
 
+### Repo
 
-<div style="border: 1px solid #e1e4e8; border-radius: 6px; padding: 16px; margin: 16px 0;">
-  <h3 style="margin-top: 0;">go-linter-runner-example</h3>
-  <div>⚠️ Failed to get repository details</div>
-</div>
 
+- Status: ⚠ Failed to get repository details
+
+
+### Result
 
 Got total 2 lines output in action: https://github.com/xxx
 
