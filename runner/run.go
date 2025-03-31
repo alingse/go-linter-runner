@@ -2,18 +2,17 @@ package runner
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/alingse/go-linter-runner/runner/run"
 )
 
-func Run(repo string, jsonCfg string, yamlCfg string) {
+func Run(repo string, jsonCfg string, yamlCfg string) error {
 	cfg, err := run.LoadCfg(repo, jsonCfg, yamlCfg)
 	if err != nil {
-		log.Fatal("load config failed: ", err)
-
-		return
+		return fmt.Errorf("load config failed: %w", err)
 	}
 
 	ctx := context.Background()
@@ -25,29 +24,23 @@ func Run(repo string, jsonCfg string, yamlCfg string) {
 
 	repoInfo, err := run.Prepare(ctx, cfg)
 	if err != nil {
-		log.Fatal("failed in prepare linter:", err)
-
-		return
+		return fmt.Errorf("failed in prepare linter: %w", err)
 	}
 
 	err = run.Build(ctx, cfg)
 	if err != nil {
 		log.Printf("build failed and exit %+v %s", err, err.Error())
-
-		return
+		return nil
 	}
 
 	outputs, err := run.Run(ctx, cfg)
 	if err != nil {
-		log.Fatal("failed in run linter:", err)
-
-		return
+		return fmt.Errorf("failed in run linter: %w", err)
 	}
 
 	if len(outputs) == 0 {
 		log.Println("no valid output after run")
-
-		return
+		return nil
 	}
 
 	// clean
@@ -57,8 +50,7 @@ func Run(repo string, jsonCfg string, yamlCfg string) {
 
 	if len(outputs) == 0 {
 		log.Println("no valid output after parse and filter")
-
-		return
+		return nil
 	}
 
 	run.PrintOutput(ctx, cfg, outputs)
@@ -66,9 +58,8 @@ func Run(repo string, jsonCfg string, yamlCfg string) {
 	if cfg.LinterCfg.IssueID != "" {
 		err = run.CreateIssueComment(ctx, cfg, repoInfo, outputs)
 		if err != nil {
-			log.Fatalf("failed to CreateIssueComment err %+v \n", err)
-
-			return
+			return fmt.Errorf("failed to CreateIssueComment err %w", err)
 		}
 	}
+	return nil
 }

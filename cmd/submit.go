@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"log"
 	"log/slog"
 
 	"github.com/alingse/go-linter-runner/runner"
@@ -37,10 +36,7 @@ var submitCmd = &cobra.Command{
 		}
 		ctx := cmd.Context()
 		slog.LogAttrs(ctx, slog.LevelInfo, "submit task with", slog.Any("config", cfg))
-		if err := runner.Submit(ctx, cfg); err != nil {
-			log.Fatal(err)
-		}
-		return nil
+		return runner.Submit(ctx, cfg)
 	},
 }
 
