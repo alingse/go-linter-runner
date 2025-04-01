@@ -17,5 +17,6 @@ func Submit(ctx context.Context, cfg *submit.SubmitConfig) error {
 	if err != nil {
 		return err
 	}
+
 	return submit.SumitActions(ctx, cfg, repos)
 }

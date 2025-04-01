@@ -26,12 +26,12 @@ func FetchRepoInfo(repoID string) (*RepoInfo, error) {
 
 	err := cmd.Run()
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch repo info: %v, stderr: %s", err, stderr.String())
+		return nil, fmt.Errorf("failed to fetch repo info: %w, stderr: %s", err, stderr.String())
 	}
 
 	var info RepoInfo
 	if err := json.Unmarshal(stdout.Bytes(), &info); err != nil {
-		return nil, fmt.Errorf("failed to parse repo info: %v", err)
+		return nil, fmt.Errorf("failed to parse repo info: %w", err)
 	}
 
 	return &info, nil

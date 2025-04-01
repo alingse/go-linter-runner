@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -25,11 +26,8 @@ type issueCommentData struct {
 }
 
 var templateFuncs = template.FuncMap{
-	"formatCount": formatCount,
-	"isOldDate":   isOldDate,
-	"formatDate":  formatDate,
-	"repoName":    repoName,
-	"yearsSince":  yearsSince,
+	"formatCount":  formatCount,
+	"buildWarning": buildWarning,
 }
 
 func buildIssueComment(cfg *Config, repoInfo *RepoInfo, outputs []string) (string, error) {
@@ -58,52 +56,49 @@ func buildIssueComment(cfg *Config, repoInfo *RepoInfo, outputs []string) (strin
 
 	comment := tpl.String()
 	comment = strings.TrimSpace(comment)
+
 	return comment, nil
+}
+
+func buildWarning(repoInfo *RepoInfo) string {
+	if repoInfo == nil {
+		return "Failed to fetch detail"
+	}
+
+	warnings := make([]string, 0)
+
+	if repoInfo.IsArchived {
+		warnings = append(warnings, `Repo is archived`)
+	}
+
+	if old, year := isOldDate(repoInfo.PushedAt); old {
+		warnings = append(warnings, fmt.Sprintf("Last commit %d years ago", year))
+	}
+
+	return strings.Join(warnings, ", ")
 }
 
 func formatCount(count int) string {
 	if count >= 1000 {
 		return fmt.Sprintf("%.1fk", float64(count)/1000)
 	}
-	return fmt.Sprintf("%d", count)
+
+	return strconv.Itoa(count)
 }
 
-func isOldDate(dateStr string) bool {
+func isOldDate(dateStr string) (bool, int) {
 	if dateStr == "" {
-		return false
+		return false, 0
 	}
+
 	t, err := time.Parse(time.RFC3339, dateStr)
 	if err != nil {
-		return false
+		return false, 0
 	}
-	return time.Since(t) > 365*24*time.Hour
-}
 
-func formatDate(dateStr string) string {
-	t, err := time.Parse(time.RFC3339, dateStr)
-	if err != nil {
-		return dateStr
-	}
-	return t.Format(time.DateTime)
-}
+	year := int(time.Since(t).Hours() / 24 / 365)
 
-func yearsSince(dateStr string) int {
-	if dateStr == "" {
-		return 0
-	}
-	t, err := time.Parse(time.RFC3339, dateStr)
-	if err != nil {
-		return 0
-	}
-	return int(time.Since(t).Hours() / 24 / 365)
-}
-
-func repoName(url string) string {
-	parts := strings.Split(url, "/")
-	if len(parts) < 2 {
-		return url
-	}
-	return parts[len(parts)-1]
+	return year >= 1, year
 }
 
 func buildIssueCommentLine(cfg *Config, line string) string {

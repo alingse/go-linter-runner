@@ -24,6 +24,7 @@ var runCmd = &cobra.Command{
 		if repo == "" {
 			return errors.New("the -r/--repo muest be set.")
 		}
+
 		return runner.Run(repo, jsonConfig, yamlConfig)
 	},
 }
