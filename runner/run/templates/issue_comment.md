@@ -8,7 +8,7 @@
 {{if $repoInfo}}
 **⭐ Stars**:    {{if $repoInfo}}{{ formatCount $repoInfo.StargazerCount }}{{end}}
 **🍴 Forks**:    {{if $repoInfo}}{{ formatCount $repoInfo.ForkCount }}{{end}}
-**⌨ Pushe**:    {{if $repoInfo}}{{ $repoInfo.PushedAt }}{{end}}{{end}}{{if $warning}}
+**⌨ Pushed**:    {{if $repoInfo}}{{ $repoInfo.PushedAt }}{{end}}{{end}}{{if $warning}}
 **🚨 Warning**:  {{$warning}}{{end}}
 
 **🧐 Found Issues**:  {{len .Lines}}
