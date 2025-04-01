@@ -125,6 +125,7 @@ func TestBuildIssueCommentWithRepoInfo(t *testing.T) {
 			got, err := buildIssueComment(tt.cfg, tt.repoInfo, outputs)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("buildIssueComment() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 
@@ -132,24 +133,23 @@ func TestBuildIssueCommentWithRepoInfo(t *testing.T) {
 			if !strings.Contains(got, tt.cfg.LinterCfg.LinterCommand) {
 				t.Error("output should contain linter command")
 			}
+
 			if !strings.Contains(got, tt.cfg.Repo) {
 				t.Error("output should contain repo URL")
 			}
 
 			// Check repo info display
 			if tt.repoInfo != nil {
-				if tt.repoInfo.IsArchived && !strings.Contains(got, "Archived") {
+				if tt.repoInfo.IsArchived && !strings.Contains(got, "archived") {
 					t.Error("archived repo should show warning")
 				}
+
 				if tt.repoInfo.StargazerCount >= 1000 && !strings.Contains(got, "k") {
 					t.Error("large star count should be formatted")
 				}
+
 				if tt.repoInfo.ForkCount >= 1000 && !strings.Contains(got, "k") {
 					t.Error("large fork count should be formatted")
-				}
-			} else {
-				if !strings.Contains(got, "Failed to get repository details") {
-					t.Error("nil repoInfo should show error message")
 				}
 			}
 
@@ -195,146 +195,6 @@ func TestFormatCount(t *testing.T) {
 	}
 }
 
-func TestIsOldDate(t *testing.T) {
-	tests := []struct {
-		name string
-		arg  string
-		want bool
-	}{
-		{
-			name: "empty date",
-			arg:  "",
-			want: false,
-		},
-		{
-			name: "recent date",
-			arg:  time.Now().Format(time.RFC3339),
-			want: false,
-		},
-		{
-			name: "old date",
-			arg:  time.Now().AddDate(-2, 0, 0).Format(time.RFC3339),
-			want: true,
-		},
-		{
-			name: "invalid date",
-			arg:  "invalid-date",
-			want: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := isOldDate(tt.arg); got != tt.want {
-				t.Errorf("isOldDate() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestYearsSince(t *testing.T) {
-	now := time.Now()
-	tests := []struct {
-		name string
-		arg  string
-		want int
-	}{
-		{
-			name: "empty date",
-			arg:  "",
-			want: 0,
-		},
-		{
-			name: "current date",
-			arg:  now.Format(time.RFC3339),
-			want: 0,
-		},
-		{
-			name: "1 year ago",
-			arg:  now.AddDate(-1, 0, 0).Format(time.RFC3339),
-			want: 1,
-		},
-		{
-			name: "2 years ago",
-			arg:  now.AddDate(-2, 0, 0).Format(time.RFC3339),
-			want: 2,
-		},
-		{
-			name: "invalid date",
-			arg:  "invalid-date",
-			want: 0,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := yearsSince(tt.arg); got != tt.want {
-				t.Errorf("yearsSince() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestFormatDate(t *testing.T) {
-	now := time.Now()
-	tests := []struct {
-		name string
-		arg  string
-		want string
-	}{
-		{
-			name: "valid date",
-			arg:  now.Format(time.RFC3339),
-			want: now.Format(time.DateTime),
-		},
-		{
-			name: "invalid date",
-			arg:  "invalid-date",
-			want: "invalid-date",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := formatDate(tt.arg); got != tt.want {
-				t.Errorf("formatDate() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestRepoName(t *testing.T) {
-	tests := []struct {
-		name string
-		arg  string
-		want string
-	}{
-		{
-			name: "normal repo URL",
-			arg:  "https://github.com/example/repo",
-			want: "repo",
-		},
-		{
-			name: "short URL",
-			arg:  "https://github.com/repo",
-			want: "repo",
-		},
-		{
-			name: "invalid URL",
-			arg:  "not-a-url",
-			want: "not-a-url",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := repoName(tt.arg); got != tt.want {
-				t.Errorf("repoName() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestFullInfo(t *testing.T) {
 	outputs := []string{
 		"example output line 1",
@@ -352,11 +212,11 @@ func TestFullInfo(t *testing.T) {
 	repoInfo := &RepoInfo{
 		StargazerCount: 5792,
 		ForkCount:      369,
-		PushedAt:       "2024-12-07T14:51:24Z",
+		PushedAt:       "2020-12-07T14:51:24Z",
 		UpdatedAt:      "2025-03-30T01:26:21Z",
 		IsFork:         false,
 		IsEmpty:        false,
-		IsArchived:     false,
+		IsArchived:     true,
 	}
 
 	t.Setenv("GH_ACTION_LINK", "https://github.com/example/action")
@@ -370,6 +230,7 @@ func TestFullInfo(t *testing.T) {
 	if !strings.Contains(body, baseCfg.LinterCfg.LinterCommand) {
 		t.Error("output should contain linter command")
 	}
+
 	if !strings.Contains(body, baseCfg.Repo) {
 		t.Error("output should contain repo URL")
 	}
@@ -378,10 +239,12 @@ func TestFullInfo(t *testing.T) {
 	if !strings.Contains(body, "5.8k") {
 		t.Error("should show formatted star count")
 	}
+
 	if !strings.Contains(body, "369") {
 		t.Error("should show fork count")
 	}
-	if !strings.Contains(body, "2024-12-07 14:51:24") {
+
+	if !strings.Contains(body, "2020-12-07") {
 		t.Error("should show pushed at date")
 	}
 
@@ -391,5 +254,6 @@ func TestFullInfo(t *testing.T) {
 			t.Errorf("output should contain line: %s", line)
 		}
 	}
+
 	t.Logf("build body\n---\n%s\n---", body)
 }

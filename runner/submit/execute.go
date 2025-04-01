@@ -53,6 +53,7 @@ func getHTTPReader(ctx context.Context, url string) (io.ReadCloser, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -121,9 +122,11 @@ func submitRepo(ctx context.Context, cfg *SubmitConfig, repo string) error {
 	if cfg.WorkflowRef != "" {
 		args = append(args, "-r", cfg.WorkflowRef)
 	}
+
 	args = append(args, "-F", "repo_url="+repo)
 
 	cmd := exec.CommandContext(ctx, "gh", args...)
 	cmd.Dir = "."
+
 	return utils.RunCmd(cmd)
 }

@@ -53,7 +53,7 @@ func Prepare(ctx context.Context, cfg *Config) (*RepoInfo, error) {
 	}
 
 	// skip for archived
-	//if repoInfo.IsArchived {
+	// if repoInfo.IsArchived {
 	//	return nil
 	//}
 	// clone repo

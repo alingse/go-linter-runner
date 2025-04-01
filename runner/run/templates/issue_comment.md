@@ -1,27 +1,24 @@
-{{ $repoName := repoName .RepositoryURL }}
 {{ $repoInfo := .RepoInfo }}
-Run `{{.Linter}}` on Repo: {{.RepositoryURL}}
+{{ $warning := buildWarning $repoInfo}}
+### Go-linter-runner Report
 
-### Repo
+**Linter**:     `{{ .Linter }}`
+**Repository**:  [{{ .RepositoryURL }}]({{ .RepositoryURL }})
 
 {{if $repoInfo}}
-- ⭐[Stars]({{.RepositoryURL}}/stargazers): {{ formatCount $repoInfo.StargazerCount }}
-- 🍴[Forks]({{.RepositoryURL}}/network/members): {{ formatCount $repoInfo.ForkCount }}
-- PushedAt: {{ formatDate $repoInfo.PushedAt }}
-- Status: {{if $repoInfo.IsArchived}}⚠ Archived{{end}}{{if isOldDate $repoInfo.PushedAt}}, ⚠ Last Commit {{ yearsSince $repoInfo.PushedAt }} years ago{{end}}
-{{else}}
-- Status: ⚠ Failed to get repository details
-{{end}}
+**⭐ Stars**:    {{if $repoInfo}}{{ formatCount $repoInfo.StargazerCount }}{{end}}
+**🍴 Forks**:    {{if $repoInfo}}{{ formatCount $repoInfo.ForkCount }}{{end}}
+**⌨ Pushed**:    {{if $repoInfo}}{{ $repoInfo.PushedAt }}{{end}}{{end}}{{if $warning}}
+**🚨 Warning**:  {{$warning}}{{end}}
 
-### Result
+**🧐 Found Issues**:  {{len .Lines}}
 
-Got total {{len .Lines}} lines output in action: {{ .GithubActionLink }}
+View Action Log: {{ .GithubActionLink }}
+Report issue:    {{ .RepositoryURL }}/issues
 
-<details open>
-<summary>Click to expand details</summary>
-<ol>{{range $index, $line := .Lines}}
-<li>{{$line}}</li>
-{{- end}}</ol>
+<details>
+<summary>Show details ({{len .Lines}} issues)</summary>
+{{range $index, $line := .Lines}}
+- {{$line}}
+{{- end}}
 </details>
-
-Report issue: {{ .RepositoryURL }}/issues

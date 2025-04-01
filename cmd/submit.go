@@ -36,6 +36,7 @@ var submitCmd = &cobra.Command{
 		}
 		ctx := cmd.Context()
 		slog.LogAttrs(ctx, slog.LevelInfo, "submit task with", slog.Any("config", cfg))
+
 		return runner.Submit(ctx, cfg)
 	},
 }

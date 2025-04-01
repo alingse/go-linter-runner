@@ -30,6 +30,7 @@ func Run(repo string, jsonCfg string, yamlCfg string) error {
 	err = run.Build(ctx, cfg)
 	if err != nil {
 		log.Printf("build failed and exit %+v %s", err, err.Error())
+
 		return nil
 	}
 
@@ -40,6 +41,7 @@ func Run(repo string, jsonCfg string, yamlCfg string) error {
 
 	if len(outputs) == 0 {
 		log.Println("no valid output after run")
+
 		return nil
 	}
 
@@ -50,6 +52,7 @@ func Run(repo string, jsonCfg string, yamlCfg string) error {
 
 	if len(outputs) == 0 {
 		log.Println("no valid output after parse and filter")
+
 		return nil
 	}
 
@@ -61,5 +64,6 @@ func Run(repo string, jsonCfg string, yamlCfg string) error {
 			return fmt.Errorf("failed to CreateIssueComment err %w", err)
 		}
 	}
+
 	return nil
 }
