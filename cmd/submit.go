@@ -13,7 +13,7 @@ var submitCmd = &cobra.Command{
 	Use:   "submit",
 	Short: "submit repo url files into github actions",
 	Long:  ``,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(cmd *cobra.Command, _ []string) error {
 		sourceFile := *sourceFilePtr
 		if sourceFile == "" {
 			return errors.New("--source is required")

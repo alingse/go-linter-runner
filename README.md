@@ -1,50 +1,108 @@
 # go-linter-runner
 
-Use GitHub Actions to run Go linters on public Go repositories and report the results as issue comments.
+GitHub Action for running Go linters on multi repositories and posting issue comments. Supports single repository runs and batch task submissions.
 
-## Background
-After implementing certain linters or linter idea, you may want to check if online repositories also have similar problem. For example, https://github.com/alingse/asasalint and https://github.com/ashanbrown/makezero#15 have discovered a large number of online bugs.
+## Commend Example
 
-However, manually observing the Actions results and ignoring certain specific errors can be quite tedious, so this project can be used to automate the process.
+### Go-linter-runner Report
 
-# Usage
+**Linter**:     `nilnesserr`
+**Repository**:  [https://github.com/pingcap/tidb-dashboard](https://github.com/pingcap/tidb-dashboard)
 
-It is recommended to integrate this into your GitHub Workflow.
 
-## Configure a workflow to run for a single Repository
+**⭐ Stars**:    187
+**🍴 Forks**:    139
+**⌨ Pushed**:    2025-03-31T03:39:07Z
 
-Refer to the [.github/workflows/go-linter-runner.yml](https://github.com/alingse/go-linter-runner/blob/main/.github/workflows/go-linter-runner.yml) configuration to set up the parameters for installing and running the linter.
+**🧐 Found Issues**:  1
+
+View Action Log: https://github.com/alingse/nilnesserr/actions/runs/14202053344
+Report issue:    https://github.com/pingcap/tidb-dashboard/issues
+
+<details>
+<summary>Show details (1 issues)</summary>
+
+- <a href="https://github.com/pingcap/tidb-dashboard/blob/master/pkg/apiserver/configuration/service.go#L239">pkg/apiserver/configuration/service.go#L239</a> call function with a nil value error after check error
+</details>
+
+## Quick Start
+
+### Single Repository Run
+```yaml
+- uses: alingse/go-linter-runner@v1.0.1
+  with:
+    action: run
+    repo_url: https://github.com/owner/repo
+    install_command: go install github.com/example/linter@latest
+    linter_command: linter --flags
+  env:
+    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+### Batch Task Submission
+```yaml
+- uses: alingse/go-linter-runner@v1.0.1
+  with:
+    action: submit
+    submit_source_file: source/top.txt
+    submit_repo_count: 1000
+  env:
+    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+## Parameters
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `go_version` | Go version | 1.22 |
+| `action` | Action type: 'run' or 'submit' | run |
+| `yaml_config` | run action: YAML config file path for linter | empty |
+| `repo_url` | Repository URL to check | required |
+| `workdir` | run action: Working directory | . |
+| `install_command` | run action: Command to install linter | empty |
+| `linter_command` | run action: Command to run linter | empty |
+| `excludes` | run action: Strings to exclude in output (regex supported) | [] |
+| `includes` | run action: Strings to include in output (regex supported) | [".go"] |
+| `issue_id` | run action: Issue ID to comment when problems found | empty |
+| `enable_testfile` | run action: Whether to check _test.go files | false |
+| `submit_source_file` | submit action: Repository list file | top.txt |
+| `submit_repo_count` | submit action: Number of repositories to submit | 1000 |
+| `submit_workflow` | submit action: Workflow file to run | go-linter-runner.yml |
+| `submit_workflow_ref` | submit action: Workflow branch reference | empty |
+| `submit_rate` | submit action: Rate limit (requests per second) | 0.25 |
+
+## Detailed Usage
+
+### Single Repository Run Examples
 
 ```yaml
-- name: Example -> go-linter-runner run with yaml job config
+- name: Run with YAML config
   uses: alingse/go-linter-runner@v1.0.1
   with:
     action: run
-    yaml_config: .github/jobs/alingse-makezero.yaml
+    yaml_config: .github/jobs/linter-config.yaml
     repo_url: ${{ inputs.repo_url }}
   env:
     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-- name: Example -> go-linter-runner use direct job config
+- name: Run with direct parameters
   uses: alingse/go-linter-runner@v1.0.1
   with:
     action: run
-    install_command: go install github.com/alingse/makezero@f6a823578e89de5cdfdfef50d4a5d9a09ade16dd
-    linter_command: makezero
+    install_command: go install github.com/example/linter@version
+    linter_command: linter --flags
     includes: '["go", "github"]'
-    excludes: '["assigned by index", "funcall", "called by funcs"]'
+    excludes: '["ignore this"]'
     issue_id: 1
     repo_url: ${{ inputs.repo_url }}
   env:
     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## Configure a workflow to submit multiple run tasks
-
-Refer to the [.github/workflows/go-linter-runner-submit.yml](https://github.com/alingse/go-linter-runner/blob/main/.github/workflows/go-linter-runner-submit.yml) configuration to set up the information needed to submit the tasks.
+### Batch Task Submission Example
 
 ```yaml
-- name: Submit go-linter-runner actions for repos
+- name: Submit batch tasks
   uses: alingse/go-linter-runner@v1.0.1
   with:
     action: submit
@@ -55,26 +113,22 @@ Refer to the [.github/workflows/go-linter-runner-submit.yml](https://github.com/
     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-## Run locally with a binary
+## Local Execution
 
 ```bash
 go install github.com/alingse/go-linter-runner@latest
-go-linter-runner --help
 
-# submit task locally
-go-linter-runner submit -s ../go-linter-runner/source/top.txt -c 10000
--w go-linter-runner.yml
+# Submit tasks
+go-linter-runner submit -s source/top.txt -c 10000 -w go-linter-runner.yml
 
-# or you can run workflow use gh client
-tail -1000 ../go-linter-runner/source/awesome.txt|xargs -I {} gh workflow run go-linter-runner.yml -F repo_url={}
+# Or using gh client
+tail -1000 source/awesome.txt | xargs -I {} gh workflow run go-linter-runner.yml -F repo_url={}
 ```
 
-# Other
+## Example Results
 
-## GitHub Effects
+See latest comments in https://github.com/alingse/go-linter-runner/issues/1.
 
-Refer to the latest comments in https://github.com/alingse/go-linter-runner/issues/1 for the effect.
-
-# Contribution
+## Contribution
 
 Welcome to try, submit Issues and Pull Requests!

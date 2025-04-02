@@ -12,17 +12,17 @@ var runCmd = &cobra.Command{
 	Use:   "run",
 	Short: "run the linter for repo by a given config",
 	Long:  ``,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(_ *cobra.Command, _ []string) error {
 		yamlData, _ := os.ReadFile(*yamlConfigPtr)
 		yamlConfig := string(yamlData)
 		jsonConfig := *jsonConfigPtr
 		if yamlConfig == "" && jsonConfig == "" {
-			return errors.New("one of the options -y and -j must be set.")
+			return errors.New("one of the options -y and -j must be set")
 		}
 
 		repo := *repoURLPtr
 		if repo == "" {
-			return errors.New("the -r/--repo muest be set.")
+			return errors.New("the -r/--repo muest be set")
 		}
 
 		return runner.Run(repo, jsonConfig, yamlConfig)

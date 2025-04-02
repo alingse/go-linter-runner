@@ -2,6 +2,7 @@ package run
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -38,6 +39,8 @@ type LinterCfg struct {
 const (
 	GithubPrefix = `https://github.com/`
 )
+
+var ErrInvalidConfig = errors.New("parse config failed")
 
 func LoadCfg(repo, jsonCfg, yamlCfg string) (*Config, error) {
 	var linterCfg LinterCfg
@@ -88,11 +91,11 @@ func LoadCfg(repo, jsonCfg, yamlCfg string) (*Config, error) {
 
 	// TODO: check more
 	if cfg.LinterCfg.InstallCommand == "" {
-		return nil, fmt.Errorf("install_command is empty %+v", cfg)
+		return nil, fmt.Errorf("install_command is empty %+v %w", cfg, ErrInvalidConfig)
 	}
 
 	if cfg.LinterCfg.LinterCommand == "" {
-		return nil, fmt.Errorf("linter_command is empty %+v", cfg)
+		return nil, fmt.Errorf("linter_command is empty %+v %w", cfg, ErrInvalidConfig)
 	}
 
 	return cfg, nil

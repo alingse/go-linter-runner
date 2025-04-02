@@ -2,9 +2,7 @@ package utils
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
-	"os/exec"
 	"strings"
 )
 
@@ -25,22 +23,36 @@ func GetStringArray(s any) (ss []string) {
 	switch value := s.(type) {
 	case string:
 		if value == "" || value == "[]" {
-			return
+			return ss
 		}
 
-		_ = json.Unmarshal([]byte(value), &ss)
+		err := json.Unmarshal([]byte(value), &ss)
+		if err != nil {
+			return nil
+		}
+
+		return ss
 	case []string:
-		return
+		return value
 	case []any:
 		if len(value) == 0 {
-			return
+			return ss
 		}
 
-		data, _ := json.Marshal(value)
-		_ = json.Unmarshal(data, &ss)
+		data, err := json.Marshal(value)
+		if err != nil {
+			return nil
+		}
+
+		err = json.Unmarshal(data, &ss)
+		if err != nil {
+			return nil
+		}
+
+		return ss
 	}
 
-	return
+	return nil
 }
 
 func CastToBool(v any) bool {
@@ -61,15 +73,4 @@ func SplitCommand(command string) (name string, args []string) {
 	}
 
 	return fields[0], fields[1:]
-}
-
-func RunCmd(cmd *exec.Cmd) error {
-	data, err := cmd.CombinedOutput()
-	fmt.Println(string(data))
-
-	if err != nil {
-		return fmt.Errorf("run %s %+v failed %w", cmd.Path, cmd.Args, err)
-	}
-
-	return nil
 }

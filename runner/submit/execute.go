@@ -3,6 +3,7 @@ package submit
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -48,6 +49,8 @@ func getFileReader(path string) (io.ReadCloser, error) {
 	return f, nil
 }
 
+var ErrReadHTTPURLFailed = errors.New("read url failed")
+
 func getHTTPReader(ctx context.Context, url string) (io.ReadCloser, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
@@ -60,7 +63,7 @@ func getHTTPReader(ctx context.Context, url string) (io.ReadCloser, error) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Get url %s failed with status %d", url, resp.StatusCode)
+		return nil, fmt.Errorf("get url %s failed with status %d %w", url, resp.StatusCode, ErrReadHTTPURLFailed)
 	}
 
 	return resp.Body, nil
@@ -128,5 +131,12 @@ func submitRepo(ctx context.Context, cfg *SubmitConfig, repo string) error {
 	cmd := exec.CommandContext(ctx, "gh", args...)
 	cmd.Dir = "."
 
-	return utils.RunCmd(cmd)
+	data, err := cmd.CombinedOutput()
+	fmt.Println(string(data))
+
+	if err != nil {
+		return fmt.Errorf("run %s %+v failed %w", cmd.Path, cmd.Args, err)
+	}
+
+	return nil
 }
