@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/url"
+	"os"
 	"strings"
 	"testing"
 )
@@ -132,4 +133,8 @@ badcodes/revive/revive_modify_value.go:22:2: suspicious assignment to a by-value
 	if len(body) == 0 {
 		t.Error("build body failed")
 	}
+
+	f, _ := os.Create("body.md")
+	defer f.Close()
+	f.WriteString(body)
 }
