@@ -173,7 +173,7 @@ func Run(ctx context.Context, cfg *Config) ([]string, error) {
 	return validOutputs, nil
 }
 
-func Parse(ctx context.Context, cfg *Config, outputs []string) []string {
+func Parse(_ context.Context, cfg *Config, outputs []string) []string {
 	// replace local path to a github link
 	for i, line := range outputs {
 		if strings.Contains(line, cfg.RepoDir) {
@@ -193,7 +193,7 @@ func Parse(ctx context.Context, cfg *Config, outputs []string) []string {
 
 const testFile = "_test.go"
 
-func FilterOutput(ctx context.Context, cfg *Config, outputs []string) []string {
+func FilterOutput(_ context.Context, cfg *Config, outputs []string) []string {
 	result := make([]string, 0, len(outputs))
 
 	enableTestfile := utils.CastToBool(cfg.LinterCfg.EnableTestfile)
@@ -213,7 +213,7 @@ func FilterOutput(ctx context.Context, cfg *Config, outputs []string) []string {
 
 var divider = strings.Repeat(`=`, 100)
 
-func PrintOutput(ctx context.Context, cfg *Config, outputs []string) {
+func PrintOutput(_ context.Context, cfg *Config, outputs []string) {
 	fmt.Printf("Run linter `%s` got %d line outputs\n", cfg.LinterCfg.LinterCommand, len(outputs))
 	fmt.Println(divider)
 	fmt.Printf("runner config: %+v\n", cfg)

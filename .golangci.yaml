@@ -1,0 +1,62 @@
+linters:
+  enable-all: true
+  disable:
+    - wrapcheck
+    - varnamelen
+    - testpackage
+    - tagliatelle
+    - paralleltest
+    - nonamedreturns
+    - mnd
+    - lll
+    - godox
+
+linters-settings:
+  depguard:
+    rules:
+      main:
+        list-mode: lax
+        files:
+          - $all
+        allow:
+          - $gostd
+          - github.com/alingse/go-linter-runner
+
+issues:
+  exclude-rules:
+    - path: "cmd"
+      linters:
+        - gochecknoinits
+        - gochecknoglobals
+        - exhaustruct
+
+    - text: "submit.SubmitConfig"
+      linters:
+        - revive
+
+    - source: "fmt.Print"
+      path: "execute.go"
+      linters:
+        - forbidigo
+
+    - text: "errors.New"
+      linters:
+        - err113
+
+    - text: "divider|templateFuncs"
+      linters:
+        - gochecknoglobals
+
+    - text: "Config|RepoInfo|LinterCfg|issueCommentData"
+      linters:
+        - exhaustruct
+
+    - source: "exec.CommandContext"
+      linters:
+        - gosec
+
+    - path: ".*_test.go"
+      linters:
+        - gocognit
+        - cyclop
+        - funlen
