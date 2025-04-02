@@ -2,32 +2,12 @@
 
 GitHub Action for running Go linters on multi repositories and posting issue comments. Supports single repository runs and batch task submissions.
 
-## Commend Example
-
-### Go-linter-runner Report
-
-**Linter**:     `nilnesserr`
-**Repository**:  [https://github.com/pingcap/tidb-dashboard](https://github.com/pingcap/tidb-dashboard)
-
-
-**⭐ Stars**:    187
-**🍴 Forks**:    139
-**⌨ Pushed**:    2025-03-31T03:39:07Z
-
-**🧐 Found Issues**:  1
-
-View Action Log: https://github.com/alingse/nilnesserr/actions/runs/14202053344
-Report issue:    https://github.com/pingcap/tidb-dashboard/issues
-
-<details>
-<summary>Show details (1 issues)</summary>
-
-- <a href="https://github.com/pingcap/tidb-dashboard/blob/master/pkg/apiserver/configuration/service.go#L239">pkg/apiserver/configuration/service.go#L239</a> call function with a nil value error after check error
-</details>
-
 ## Quick Start
 
 ### Single Repository Run
+
+see https://github.com/alingse/go-linter-runner/blob/main/.github/workflows/go-linter-runner.yml
+
 ```yaml
 - uses: alingse/go-linter-runner@v1.0.1
   with:
@@ -35,17 +15,18 @@ Report issue:    https://github.com/pingcap/tidb-dashboard/issues
     repo_url: https://github.com/owner/repo
     install_command: go install github.com/example/linter@latest
     linter_command: linter --flags
-  env:
-    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-### Batch Task Submission
+### Batch Repositories Submission
+
+see https://github.com/alingse/go-linter-runner/blob/main/.github/workflows/go-linter-runner-submit.yml
+
 ```yaml
 - uses: alingse/go-linter-runner@v1.0.1
   with:
     action: submit
-    submit_source_file: source/top.txt
-    submit_repo_count: 1000
+    submit_source_file: top.2k.txt
+    submit_repo_count: 2000
   env:
     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -128,6 +109,36 @@ tail -1000 source/awesome.txt | xargs -I {} gh workflow run go-linter-runner.yml
 ## Example Results
 
 See latest comments in https://github.com/alingse/go-linter-runner/issues/1.
+
+see https://github.com/alingse/nilnesserr/issues/11#issuecomment-2770165576
+
+
+### Go-linter-runner Report
+
+**Linter**:     `nilnesserr`
+
+**Repository**:  [https://github.com/pingcap/tidb-dashboard](https://github.com/pingcap/tidb-dashboard)
+
+
+**⭐ Stars**:    187
+
+**🍴 Forks**:    139
+
+**⌨ Pushed**:    2025-03-31T03:39:07Z
+
+
+**🧐 Found Issues**:  1
+
+View Action Log: https://github.com/alingse/nilnesserr/actions/runs/14202053344
+
+Report issue:    https://github.com/pingcap/tidb-dashboard/issues
+
+<details>
+<summary>Show details (1 issues)</summary>
+
+- <a href="https://github.com/pingcap/tidb-dashboard/blob/master/pkg/apiserver/configuration/service.go#L239">pkg/apiserver/configuration/service.go#L239</a> call function with a nil value error after check error
+</details>
+
 
 ## Contribution
 
